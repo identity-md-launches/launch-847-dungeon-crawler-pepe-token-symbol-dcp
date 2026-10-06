@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0d0f0c">
+  <title>Dungeon Crawler Pepe (DCP)</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="agegate" class="modal" hidden>
+    <div class="card">
+      <h2>🔞 Adults only</h2>
+      <p>Dungeon Crawler Pepe is an R-rated comedy: profanity, gross-out horror, cartoon violence and non-graphic sexual jokes. No real-money gambling. Prizes are small, capped and not an investment.</p>
+      <button id="ageyes" class="primary">I'm 18+ and I've made peace with that</button>
+      <p class="small">Not 18+? Close this tab.</p>
+    </div>
+  </div>
+
+  <header>
+    <div class="brand"><span class="logo">🐸</span><div><b>DUNGEON CRAWLER PEPE</b><small id="worldline">Loading the Swamp Below…</small></div></div>
+    <nav>
+      <button data-tab="play" class="tab active">Play</button>
+      <button data-tab="board" class="tab">Leaderboard</button>
+      <button data-tab="loot" class="tab">Rewards &amp; Shop</button>
+      <button data-tab="status" class="tab">Status</button>
+      <button data-tab="about" class="tab">Rules</button>
+    </nav>
+    <div id="acct" class="acct"></div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <main>
+    <section id="tab-play" class="tabpane">
+      <div id="nochar" class="card" hidden>
+        <h2>New Crawler</h2>
+        <p id="premise" class="muted"></p>
+        <label>Name <input id="cname" maxlength="20" placeholder="e.g. Moist Gregory"></label>
+        <div id="classes" class="classes"></div>
+        <button id="create" class="primary">Enter the dungeon</button>
+        <div id="roster" class="roster"></div>
+      </div>
+      <div id="game" class="game" hidden>
+        <aside class="sheet card" id="sheet"></aside>
+        <div class="stage">
+          <div class="card room" id="room"></div>
+          <div class="card map" id="map"></div>
+        </div>
+        <div class="card log" id="log"></div>
+      </div>
+    </section>
+    <section id="tab-board" class="tabpane" hidden><div class="card" id="board"></div></section>
+    <section id="tab-loot" class="tabpane" hidden>
+      <div class="card" id="wallet"></div>
+      <div class="card" id="rewards"></div>
+      <div class="card" id="shop"></div>
+    </section>
+    <section id="tab-status" class="tabpane" hidden><div class="card" id="status"></div></section>
+    <section id="tab-about" class="tabpane" hidden>
+      <div class="card prose">
+        <h2>House rules</h2>
+        <h3>Play</h3>
+        <ul>
+          <li>Every move is resolved by the server. Moves need no wallet, no transaction and no AI fee. Sessions have no time cap.</li>
+          <li>Each day the IDSC opens two more floors (depth gate = 3 + 2 × day). At the gate, Overtime Zones keep generating fresh layouts at the same depth.</li>
+          <li>Every Crawler has its own routes, encounters, quests and perk offers, shaped by its history. Reloading never rerolls anything.</li>
+        </ul>
+        <h3>Death, resets and persistence</h3>
+        <ul>
+          <li>Death is permanent for that character. It goes to the Hall of Corpses with its fame intact.</li>
+          <li>Kept across deaths: your account, cosmetics, slots, Elevator Pass (new Crawlers start at half your season-best depth), and every reward you have already earned.</li>
+          <li>Seasons reset depth and leaderboards. Your account and purchases carry over.</li>
+          <li>Saves are on the server, so any device you sign in on picks up where you left off. Guests get a recovery code; a linked wallet works too.</li>
+        </ul>
+        <h3>Items, purchases and ownership</h3>
+        <ul>
+          <li>In-game items and gold live on the server ledger. They are not tokens and can't be traded for money.</li>
+          <li>The DCP shop sells only cosmetics, slots, and Revives. A revived run cannot win leaderboard prizes, so buying one never buys rank.</li>
+          <li>An item is credited only once its purchase is final onchain. Of each purchase, 30% is burned, 50% goes back to the prize reserve and 20% funds operations.</li>
+        </ul>
+        <h3>Token prizes</h3>
+        <ul>
+          <li>Prizes are small and capped: milestones the first time you reach certain depths each season, the top ten daily fame gains, and a daily weighted draw.</li>
+          <li>To receive prizes you need a linked wallet, an account at least a day old and real play. Accounts that share a device or network split a single account's cap.</li>
+          <li>Draw randomness comes from an onchain commit-reveal, so the server can't pick winners. You can claim several epochs in one transaction.</li>
+          <li>There is no yield, no return and no guarantee that this service or its prizes will continue. Prizes you have already earned can be claimed from the reserve contract even if the operators disappear.</li>
+        </ul>
+        <h3>Sign-in safety</h3>
+        <ul>
+          <li>Connecting a wallet doesn't sign you in. You sign a one-time message that costs no gas and approves nothing.</li>
+          <li>If you switch accounts or networks in your wallet, you'll be asked to sign again.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+  <footer><span id="ver"></span> · Original world &amp; cast. Not affiliated with any book, show or meme rights holder. No anonymity is claimed: onchain actions are public.</footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
