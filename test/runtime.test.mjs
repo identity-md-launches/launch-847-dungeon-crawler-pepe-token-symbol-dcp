@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { makeApp, advance, E18, playThroughService } from './helpers.mjs';
-import { createGuest, recover, issueNonce, siweMessage, verifySignIn } from '../server/src/auth.js';
+import { createGuest, recover, issueNonce, siweMessage, verifySignIn, sessionFrom } from '../server/src/auth.js';
 import { privToAddress, signPersonal } from '../server/src/crypto/eth.js';
 import { one, all, run, openDb, backupTo, getMeta } from '../server/src/db.js';
 import { createOrder, ownedSkus } from '../server/src/shop.js';
@@ -45,6 +45,26 @@ test('authoritative save, retry identity, stale tab, unauthorized access and rec
   const played = playThroughService(app, guest.accountId, request.charId, 300);
   assert.ok(played.rev > 20);
   assert.ok(app.game.leaderboard().top.length);
+});
+
+test('housekeeping prunes stale fingerprints, sessions and nonces without reopening old actions', async (t) => {
+  const { app, guest, created } = fixture(t);
+  const request = { charId: created.character.id, rev: 0, actionId: 'old-action', action: { type: 'choose', index: 0 } };
+  app.game.act(guest.accountId, request);
+  const live = recover(app.db, guest.recovery);
+  run(app.db, 'UPDATE sessions SET expires_at = ? WHERE token_hash != (SELECT token_hash FROM sessions ORDER BY created_at DESC LIMIT 1)', Date.now() - 1);
+  const address = privToAddress(21n);
+  issueNonce(app.db, address);
+  run(app.db, 'UPDATE nonces SET issued_at = ?', Date.now() - 11 * 60_000);
+  const fresh = issueNonce(app.db, address);
+  advance(app, 8 * 86400_000);
+  await app.keeper.tick();
+  assert.equal(one(app.db, 'SELECT count(*) n FROM action_log').n, 0);
+  assert.equal(one(app.db, 'SELECT count(*) n FROM action_requests').n, 0);
+  assert.deepEqual(all(app.db, 'SELECT nonce FROM nonces').map((r) => r.nonce), [fresh]);
+  assert.equal(one(app.db, 'SELECT count(*) n FROM sessions').n, 1);
+  assert.ok(sessionFrom(app.db, live.token), 'unexpired session survives');
+  assert.throws(() => app.game.act(guest.accountId, request), (e) => e.status === 409, 'pruned retry is stale, not re-applied');
 });
 
 test('wallet authentication binds nonce, domain, network, expiry, and existing guest save', (t) => {

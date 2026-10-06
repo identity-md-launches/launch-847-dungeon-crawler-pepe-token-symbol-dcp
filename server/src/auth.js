@@ -102,6 +102,12 @@ export function verifySignIn(db, cfg, { message, signature, currentAccountId }) 
   });
 }
 
+/** Retention: delete only rows the checks above already reject (same wall clock, same bounds). */
+export function pruneAuth(db, now = Date.now()) {
+  run(db, 'DELETE FROM sessions WHERE expires_at < ?', now);
+  run(db, 'DELETE FROM nonces WHERE issued_at < ?', now - NONCE_MS);
+}
+
 /** Coarse anti-farming signal: hashed /24 (or /48) network + user agent. Never stored raw. */
 export function recordSignal(db, accountId, ip, ua, salt) {
   const net = String(ip ?? '').includes(':') ? String(ip).split(':').slice(0, 3).join(':') : String(ip ?? '').split('.').slice(0, 3).join('.');

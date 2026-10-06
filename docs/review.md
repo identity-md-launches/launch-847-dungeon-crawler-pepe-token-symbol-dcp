@@ -38,7 +38,7 @@ The two initial failing gameplay tests were traced to the test policy clearing t
 
 **Medium:** multi-wallet/proxy farming and infinite Overtime rank farming remain economically unproven; paid slots create more progression opportunities. Multiple valid gift payments can buy one entitlement with no refund. Deep reorg compensation is not automatic. Parent-version publication under simultaneous publishers and automatic season rollover are unfinished. Recovery codes are reusable bearer credentials without rotation UI. Local backups are not off-host backups. EIP-1271 is unsupported. Custom crypto and manually matched VRF interface require independent review. Deployment role authentication, real mobile wallet behavior, accessibility/performance and visual browser QA remain to be tested.
 
-**Low/maintenance:** action request fingerprints are not pruned with response cache, nonce/session tables require retention maintenance, simulation serialization targets Node 24, callback gas has not been measured against the real coordinator, and emergency unsafe-content regeneration may need more migration coverage. These are tracked rather than silently represented as production-ready.
+**Low/maintenance:** (repaired 2026-10-06: keeper housekeeping now prunes orphaned action fingerprints with the response cache, plus expired sessions and nonces under the exact bounds auth already rejects; a pruned retry is still refused as stale; regression `runtime.test.mjs` "housekeeping prunes…", 33 Node tests pass) simulation serialization targets Node 24, callback gas has not been measured against the real coordinator, and emergency unsafe-content regeneration may need more migration coverage. These are tracked rather than silently represented as production-ready.
 
 ## Results
 

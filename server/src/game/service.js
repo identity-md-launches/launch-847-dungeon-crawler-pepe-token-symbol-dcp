@@ -169,6 +169,10 @@ export class GameService {
 
   pruneActionLog(olderThanMs = 7 * 86400_000) {
     run(this.db, 'DELETE FROM action_log WHERE created_at < ?', this.now() - olderThanMs);
+    // A fingerprint commits in the same transaction as its log row, so an orphan is always pruned.
+    // A later retry of that old request carries an old rev and is rejected as stale.
+    run(this.db, `DELETE FROM action_requests WHERE NOT EXISTS (SELECT 1 FROM action_log l
+      WHERE l.account_id = action_requests.account_id AND l.action_id = action_requests.action_id)`);
   }
 }
 

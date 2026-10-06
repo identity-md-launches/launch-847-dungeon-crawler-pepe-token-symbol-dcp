@@ -6,6 +6,7 @@ import { readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { all, one, run, backupTo, getMeta, setMeta } from '../db.js';
 import { advanceEpochs } from '../economy.js';
+import { pruneAuth } from '../auth.js';
 import { runContentCycle, runway, defaultBudgetConfig, ensureRules } from './pipeline.js';
 
 export class Keeper {
@@ -76,7 +77,7 @@ export class Keeper {
       const files = readdirSync(this.backupDir).filter((f) => f.endsWith('.sqlite')).sort();
       for (const f of files.slice(0, Math.max(0, files.length - this.keepBackups))) rmSync(join(this.backupDir, f));
     }));
-    results.push(await this.task('housekeeping', () => this.game.pruneActionLog()));
+    results.push(await this.task('housekeeping', () => { this.game.pruneActionLog(); pruneAuth(this.db); }));
     setMeta(this.db, 'lastTick', { at: now, results });
     return results;
   }
