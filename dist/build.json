@@ -1,22 +1,23 @@
 {
-  "mode": "local-simulation",
+  "mode": "build-and-review",
   "api": "/api",
+  "practice": "opt-in; device-only saves; no assets or authority",
   "files": {
     "index.html": {
-      "bytes": 5892,
-      "sha256": "e08be3dd54bdc9a311f29c1ac04826a6978d7ca221b211b01f55b871ddd84085"
+      "bytes": 10061,
+      "sha256": "3834a80a7c7fd507f19c91db413a0c8bd0260585de27a178c690cd36fbc636ae"
     },
     "app.js": {
-      "bytes": 25165,
-      "sha256": "b1854fb637e6ec26ff4f9957490924d3dec9e542cd57ffa92357f0e4ce3716a2"
+      "bytes": 32908,
+      "sha256": "bdfc79a0c7bc722537e1238f5caf443862f5a53c32f5d6bb41a5e70c5d721e7d"
     },
     "wallet.js": {
-      "bytes": 2641,
-      "sha256": "f89f3416a7bba87aa01f3c2795d707c7ecbf9f44d2112711da77c14695f1395c"
+      "bytes": 2716,
+      "sha256": "90ad03742b8ea57d7abc6cc5eba033462ed02e1c9e1b96eb5c918d4d73c0e27e"
     },
     "style.css": {
-      "bytes": 5478,
-      "sha256": "21b5d6cae8a61391a432e552db56e38e0742b5932d54c528e740e68f0d6f7e6d"
+      "bytes": 14243,
+      "sha256": "70917c7e94c0885e53e284bcc85ef68a992325b4693938c2b54bc5fb821c5680"
     },
     "favicon.svg": {
       "bytes": 524,
@@ -24,7 +25,39 @@
     },
     "manifest.webmanifest": {
       "bytes": 235,
-      "sha256": "d011a2107ca91b305c0e577697462f71abccb31d005f57e43a7d59ffa539bc6b"
+      "sha256": "11f2a2e0ebdd1d5e6efdf16281db06d9da069cb9fb938e386656c26851f779cf"
+    },
+    "dungeon.svg": {
+      "bytes": 5357,
+      "sha256": "2c7c10bd7d87c1c77241c7d2ba94f2795e5af684c33c4f502edeb264bbd28063"
+    },
+    "practice.js": {
+      "bytes": 4126,
+      "sha256": "b9147a2b3516dee4ddfd1068e4c3623accb5c097770e8a0ce1ed2e9127e1a159"
+    },
+    "runtime/game/engine.js": {
+      "bytes": 43843,
+      "sha256": "06e9f9475e7ed744e3f14519df7c4ed90cfd497534dc140b0e7efc89c541d0c0"
+    },
+    "runtime/game/floor.js": {
+      "bytes": 3474,
+      "sha256": "705e453b82be6dacb2e3765a0b94cc28016a2f3bf5e8e207c7444e5e1d2b1390"
+    },
+    "runtime/game/powers.js": {
+      "bytes": 8132,
+      "sha256": "6cbb3918ad264e151a517f96c2f63cb7049e5f87ae926ba6511293ab47901f2e"
+    },
+    "runtime/game/content.js": {
+      "bytes": 2258,
+      "sha256": "c5441e912ed7caa7326b00d9196f3aa89506b6db71a4e407c2008ef245574d44"
+    },
+    "runtime/game/rng.js": {
+      "bytes": 1248,
+      "sha256": "4fc1105f355d987657db1988cab0c30d1e0183db0ab5d99129a769dcf1fda238"
+    },
+    "runtime/content/base.js": {
+      "bytes": 31126,
+      "sha256": "9efac77ea4ab5d75dabf5d93c55e9a90aeb0dbc17a91194f1553994c435e0b1c"
     }
   }
 }

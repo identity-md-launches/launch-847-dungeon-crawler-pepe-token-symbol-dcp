@@ -4,54 +4,77 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#0d0f0c">
+  <meta name="theme-color" content="#10120f">
   <title>Dungeon Crawler Pepe (DCP)</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="agegate" class="modal" hidden>
+  <a href="#main" class="skip">Skip to dungeon</a>
+  <dialog id="agegate" aria-labelledby="age-title">
     <div class="card">
-      <h2>🔞 Adults only</h2>
+      <p class="eyebrow">IDSC / Audience discretion</p>
+      <h2 id="age-title">This dungeon is 18+.</h2>
       <p>Dungeon Crawler Pepe is an R-rated comedy: profanity, gross-out horror, cartoon violence and non-graphic sexual jokes. No real-money gambling. Prizes are small, capped and not an investment.</p>
-      <button id="ageyes" class="primary">I'm 18+ and I've made peace with that</button>
+      <button id="ageyes" class="primary">I'm 18+ — enter the dungeon</button>
       <p class="small">Not 18+? Close this tab.</p>
     </div>
-  </div>
+  </dialog>
+
+  <dialog id="recovery-dialog" aria-labelledby="recovery-title">
+    <form id="recovery-form" class="card">
+      <h2 id="recovery-title">Recover your account</h2>
+      <p>Use the code saved when you joined this server. Keep it private.</p>
+      <label for="recovery-code">Recovery code</label>
+      <input id="recovery-code" name="recovery" autocomplete="off" required aria-describedby="recovery-error">
+      <p id="recovery-error" class="bad" role="alert"></p>
+      <div class="actions"><button type="submit" class="primary">Recover account</button><button type="button" id="recovery-close">Cancel</button></div>
+    </form>
+  </dialog>
 
   <header>
-    <div class="brand"><span class="logo">🐸</span><div><b>DUNGEON CRAWLER PEPE</b><small id="worldline">Loading the Swamp Below…</small></div></div>
-    <nav>
-      <button data-tab="play" class="tab active">Play</button>
-      <button data-tab="board" class="tab">Leaderboard</button>
-      <button data-tab="loot" class="tab">Rewards &amp; Shop</button>
-      <button data-tab="status" class="tab">Status</button>
-      <button data-tab="about" class="tab">Rules</button>
+    <a class="brand" href="#play" aria-label="Dungeon Crawler Pepe home"><img src="favicon.svg" width="38" height="38" alt=""><span>Dungeon Crawler <b>Pepe</b><small>A bad day to be amphibious.</small></span></a>
+    <nav aria-label="Main navigation">
+      <button data-tab="play" class="tab active" aria-current="page"><span aria-hidden="true">⚔</span> Dungeon</button>
+      <button data-tab="board" class="tab">Rankings</button>
+      <button data-tab="loot" class="tab">Loot &amp; shop</button>
+      <button data-tab="status" class="tab">Operations</button>
+      <button data-tab="about" class="tab">Field guide</button>
     </nav>
     <div id="acct" class="acct"></div>
   </header>
-  <p class="banner">LOCAL DEMONSTRATION · Simulated DCP, purchases and prizes · No real assets</p>
+  <div class="mode-strip"><span id="mode-label">LOCAL DEMONSTRATION</span><span>Test DCP only. No real assets.</span><span class="season-tag">Season 01 · The unpaid intern</span></div>
 
-  <div id="banner" class="banner" hidden></div>
+  <div id="banner" class="banner" hidden><span id="banner-text" role="status"></span><button id="dismiss-banner" aria-label="Dismiss notification">×</button></div>
+  <p class="sr-only" id="action-status" role="status"></p>
 
-  <main>
+  <main id="main" tabindex="-1">
     <section id="tab-play" class="tabpane">
+      <div class="page-heading"><div><p class="eyebrow">The Swamp Below / Crawler terminal</p><h1>Clock in. <em>Crawl out.</em></h1></div><span class="live-label">● Local playtest</span></div>
+      <div class="worldline" id="worldline">Your audience is hungry. Your paperwork is overdue.</div>
+      <div id="welcome" class="welcome">
+        <div class="welcome-copy"><p class="eyebrow">Welcome to the end of your world</p><h2>The dungeon has<br>a job for you.</h2><p>Kill something horrible. Acquire something worse. Survive long enough to make it everyone else's problem.</p><div class="welcome-facts"><span>8 ridiculous classes</span><span>Choice-driven builds</span><span>Free to crawl</span></div><blockquote>“Death is permanent.<br>Employment is, unfortunately, also permanent.”<cite>Phyllis Gnarr · Interdimensional HR</cite></blockquote></div>
+        <img class="dungeon-art" src="dungeon.svg" alt="A weary green frog with a sword stands at a torchlit dungeon entrance beneath a cosmic eye." width="720" height="480">
+      </div>
+      <div id="connection" class="card" hidden><h2>Dungeon server unavailable</h2><p id="connection-detail">Your server saves are unchanged. Retry the connection, or start a separate practice run saved in this browser.</p><div class="actions"><button id="practice" class="primary">Play browser practice</button><button id="retry">Retry server</button></div><p class="small">Practice has no wallet, token prizes or cross-device recovery.</p></div>
       <div id="nochar" class="card" hidden>
-        <h2>New Crawler</h2>
-        <p id="premise" class="muted"></p>
-        <label>Name <input id="cname" maxlength="20" placeholder="e.g. Moist Gregory"></label>
-        <div id="classes" class="classes"></div>
-        <button id="create" class="primary">Enter the dungeon</button>
+        <div class="section-heading"><div><p class="eyebrow">01 / Your next terrible decision</p><h2>Choose your Crawler</h2></div><span class="small">No wallet. No admission fee.</span></div>
+        <details class="world-premise"><summary>What the hell happened here?</summary><p id="premise" class="muted"></p></details>
+        <form id="character-form">
+        <fieldset><legend class="sr-only">Choose a class</legend><div id="classes" class="classes"></div></fieldset>
+        <div class="enlist"><div><label for="cname">Crawler name</label><input id="cname" name="crawler" maxlength="20" minlength="2" required autocomplete="nickname" placeholder="e.g. Moist Gregory" aria-describedby="name-hint create-error"><small id="name-hint">2–20 letters, numbers, spaces, _ ' or -</small><p id="create-error" class="bad" role="alert"></p></div><button id="create" class="primary" type="submit">Enter the dungeon <span aria-hidden="true">↘</span></button></div>
+        </form>
         <div id="roster" class="roster"></div>
       </div>
       <div id="game" class="game" hidden>
         <aside class="sheet card" id="sheet"></aside>
         <div class="stage">
-          <div class="card room" id="room"></div>
-          <div class="card map" id="map"></div>
+          <div class="encounter-art" aria-hidden="true"><img src="dungeon.svg" alt=""><span>On air / The Swamp Below</span></div>
+          <div class="card room" id="room" tabindex="-1"></div>
+          <div class="card map" id="map" tabindex="-1"></div>
         </div>
-        <div class="card log" id="log"></div>
+        <div class="card log" id="log" role="region" aria-label="Broadcast feed" tabindex="0"></div>
       </div>
     </section>
     <section id="tab-board" class="tabpane" hidden><div class="card" id="board"></div></section>
@@ -63,10 +86,10 @@
     <section id="tab-status" class="tabpane" hidden><div class="card" id="status"></div></section>
     <section id="tab-about" class="tabpane" hidden>
       <div class="card prose">
-        <h2>House rules</h2>
+        <h2>House rules</h2><p class="warn">Browser practice runs on this device only: no tokens, purchases, cross-device saves or competitive prizes. The rules below describe the integrated local demo and its proposed production economy.</p>
         <h3>Play</h3>
         <ul>
-          <li>Every move is resolved by the server. Moves need no wallet, no transaction and no AI fee. Sessions have no time cap.</li>
+          <li>In the integrated demo, every move is resolved by the server. Moves need no wallet, no transaction and no AI fee. Sessions have no time cap.</li>
           <li>Each day the IDSC opens two more floors (depth gate = 3 + 2 × day). At the gate, Overtime Zones keep generating fresh layouts at the same depth.</li>
           <li>Every Crawler has its own routes, encounters, quests and perk offers, shaped by its history. Reloading never rerolls anything.</li>
         </ul>
@@ -74,19 +97,19 @@
         <ul>
           <li>Death is permanent for that character. It goes to the Hall of Corpses with its fame intact.</li>
           <li>Kept across deaths: your account, cosmetics, slots, Elevator Pass (new Crawlers start at half your season-best depth), and every reward you have already earned.</li>
-          <li>Seasons reset depth and leaderboards. Your account and purchases carry over.</li>
+          <li>Planned seasons reset depth and leaderboards while preserving accounts and purchases. Automatic season rollover is not implemented in this build.</li>
           <li>Saves are on the server, so any device you sign in on picks up where you left off. Guests get a recovery code; a linked wallet works too.</li>
         </ul>
         <h3>Items, purchases and ownership</h3>
         <ul>
           <li>In-game items and gold live on the server ledger. They are not tokens and can't be traded for money.</li>
-          <li>The DCP shop sells only cosmetics, slots, and Revives. A revived run cannot win leaderboard prizes, so buying one never buys rank.</li>
+          <li>The DCP shop sells only cosmetics, slots, and Revives. A revived run cannot win leaderboard prizes, and extra slots give you more build choices. Prize fairness still requires independent review.</li>
           <li>An item is credited only once its purchase is final onchain. Of each purchase, 30% is burned, 50% goes back to the prize reserve and 20% funds operations.</li>
         </ul>
         <h3>Token prizes</h3>
         <ul>
           <li>Prizes are small and capped: milestones the first time you reach certain depths each season, the top ten daily fame gains, and a daily weighted draw.</li>
-          <li>To receive prizes you need a linked wallet, an account at least a day old and real play. Accounts that share a device or network split a single account's cap.</li>
+          <li>To receive prizes you need a linked wallet, an account at least a day old and real play under the proposed launch rules. The local test fixture waives the age delay. Accounts that share a device or network split a single account's cap.</li>
           <li>This build uses simulated draws and test DCP only. A later launch requires funded, verified randomness and independent score review. No real prizes are enabled here.</li>
           <li>There is no yield, return or service guarantee. Final contract claims are designed to remain claimable without operators; pending off-chain awards still depend on settlement and published proofs.</li>
         </ul>
@@ -98,7 +121,7 @@
       </div>
     </section>
   </main>
-  <footer><span id="ver"></span> · Original world &amp; cast. Not affiliated with any book, show or meme rights holder. No anonymity is claimed: onchain actions are public.</footer>
+  <footer><span class="footer-brand">DCP / Dungeon Crawler Pepe</span><span id="ver">Build &amp; review · Not a launch</span><p>18+ · Original world &amp; cast. Not affiliated with any book, show or meme rights holder.<br>No anonymity is claimed. Onchain actions are public.</p></footer>
   <script type="module" src="app.js"></script>
 </body>
 </html>

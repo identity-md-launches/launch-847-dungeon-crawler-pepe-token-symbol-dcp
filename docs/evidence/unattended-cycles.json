@@ -2,13 +2,13 @@
   "label": "LOCAL TEST FIXTURE; no paid work",
   "cycles": [
     {
-      "id": "c1-mux6apwz",
+      "id": "c1-mux7ac27",
       "stage": "done",
       "status": "done",
       "attempts": 1
     },
     {
-      "id": "c8-mv76dop3",
+      "id": "c8-mv77daxh",
       "stage": "done",
       "status": "done",
       "attempts": 1
@@ -23,18 +23,18 @@
     {
       "version": 2,
       "status": "published",
-      "packs": "[\"pack-c1-mux6apwz\"]"
+      "packs": "[\"pack-c1-mux7ac27\"]"
     },
     {
       "version": 3,
       "status": "published",
-      "packs": "[\"pack-c1-mux6apwz\",\"pack-c8-mv76dop3\"]"
+      "packs": "[\"pack-c1-mux7ac27\",\"pack-c8-mv77daxh\"]"
     }
   ],
   "payments": 0,
   "rulesVersion": 1,
   "keeper": {
-    "at": 1791925841991,
+    "at": 1791927503765,
     "results": [
       {
         "name": "chain-refresh",

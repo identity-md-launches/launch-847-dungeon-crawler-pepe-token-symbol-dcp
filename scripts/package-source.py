@@ -7,7 +7,7 @@ import io
 import tarfile
 
 root = Path(__file__).resolve().parents[1]
-paths = [root / "README.md", root / "foundry.toml"]
+paths = [root / "README.md", root / "DESIGN.md", root / "REVIEW.md", root / "foundry.toml"]
 for name in ("contracts", "server", "web", "dist", "test", "scripts", "deploy", "docs", "lib"):
     paths.extend((root / name).rglob("*"))
 files = []

@@ -1,1 +1,1 @@
-{ "name": "Dungeon Crawler Pepe", "short_name": "DCP", "start_url": "./", "display": "standalone", "background_color": "#0d0f0c", "theme_color": "#0d0f0c", "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }] }
+{ "name": "Dungeon Crawler Pepe", "short_name": "DCP", "start_url": "./", "display": "standalone", "background_color": "#10120f", "theme_color": "#10120f", "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }] }

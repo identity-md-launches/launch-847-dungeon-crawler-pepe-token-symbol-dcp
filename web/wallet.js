@@ -6,12 +6,12 @@ export class Wallet {
     this.chainId = chainId;
     this.onChange = onChange;
     this.providers = [];
-    window.addEventListener('eip6963:announceProvider', (e) => this.providers.push(e.detail));
+    window.addEventListener('eip6963:announceProvider', (e) => this.providers.push((/** @type {CustomEvent} */ (e)).detail));
     window.dispatchEvent(new Event('eip6963:requestProvider'));
   }
 
   pick() {
-    const p = this.providers[0]?.provider ?? window.ethereum;
+    const p = this.providers[0]?.provider ?? (/** @type {Window & {ethereum?:any}} */ (window)).ethereum;
     if (!p) throw new Error('No wallet found. On mobile, open this page in your wallet app\'s browser.');
     return p;
   }

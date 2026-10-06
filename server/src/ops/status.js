@@ -28,7 +28,7 @@ export function statusReport({ db, chain, game, budgetCfg, appVersion }) {
     outages: recentOutages(db).map(({ component, started_at, ended_at }) => ({ component, started_at, ended_at, note: 'See private operator diagnostics' })),
     disclaimers: [
       'No yield, returns or perpetual service are promised. Prizes are small, capped, and may stop.',
-      'Player claims are paid by GameReserve directly and do not depend on the operator staying online.',
+      'Final contract claims with published proofs can be paid by GameReserve without an operator. Pending off-chain awards still depend on settlement and proof publication.',
     ],
   };
 }
