@@ -1,0 +1,120 @@
+{
+  "label": "Illustrative assumptions, not quotes or forecast",
+  "scenarios": {
+    "zeroVolume": {
+      "assumptions": {},
+      "result": {
+        "days": 90,
+        "treasuryMilliImd": 506500,
+        "operationalSpendMilliImd": 2480000,
+        "contentSpendMilliImd": 13500,
+        "convertedMilliImd": 0,
+        "accumulatedDcp": 0,
+        "failedConversions": 0,
+        "dormantAtDay": 62,
+        "reserveDcp": 698940000,
+        "immutablePlayerClaimsDcp": 7000,
+        "prizesDcp": 1060000,
+        "conservation": true
+      }
+    },
+    "shallowLiquidity": {
+      "assumptions": {
+        "feeDcp": 20000,
+        "depthDcp": 1000
+      },
+      "result": {
+        "days": 90,
+        "treasuryMilliImd": 506500,
+        "operationalSpendMilliImd": 2480000,
+        "contentSpendMilliImd": 13500,
+        "convertedMilliImd": 0,
+        "accumulatedDcp": 1800000,
+        "failedConversions": 90,
+        "dormantAtDay": 62,
+        "reserveDcp": 698940000,
+        "immutablePlayerClaimsDcp": 7000,
+        "prizesDcp": 1060000,
+        "conservation": true
+      }
+    },
+    "priceFall90Percent": {
+      "assumptions": {
+        "feeDcp": 20000,
+        "priceMilliImd": 0.1,
+        "depthDcp": 100000000
+      },
+      "result": {
+        "days": 90,
+        "treasuryMilliImd": 520600,
+        "operationalSpendMilliImd": 2640000,
+        "contentSpendMilliImd": 14000,
+        "convertedMilliImd": 174600,
+        "accumulatedDcp": 0,
+        "failedConversions": 0,
+        "dormantAtDay": 65,
+        "reserveDcp": 698880000,
+        "immutablePlayerClaimsDcp": 7000,
+        "prizesDcp": 1120000,
+        "conservation": true
+      }
+    },
+    "risingCosts4x": {
+      "assumptions": {
+        "costMultiplier": 4
+      },
+      "result": {
+        "days": 90,
+        "treasuryMilliImd": 600000,
+        "operationalSpendMilliImd": 2400000,
+        "contentSpendMilliImd": 0,
+        "convertedMilliImd": 0,
+        "accumulatedDcp": 0,
+        "failedConversions": 0,
+        "dormantAtDay": 15,
+        "reserveDcp": 700000000,
+        "immutablePlayerClaimsDcp": 7000,
+        "prizesDcp": 0,
+        "conservation": true
+      }
+    },
+    "depletedReserve": {
+      "assumptions": {
+        "reserveDcp": 7000
+      },
+      "result": {
+        "days": 90,
+        "treasuryMilliImd": 506500,
+        "operationalSpendMilliImd": 2480000,
+        "contentSpendMilliImd": 13500,
+        "convertedMilliImd": 0,
+        "accumulatedDcp": 0,
+        "failedConversions": 0,
+        "dormantAtDay": 62,
+        "reserveDcp": 7000,
+        "immutablePlayerClaimsDcp": 7000,
+        "prizesDcp": 0,
+        "conservation": true
+      }
+    },
+    "unfundedBootstrap": {
+      "assumptions": {
+        "imd": 0
+      },
+      "result": {
+        "days": 90,
+        "treasuryMilliImd": 0,
+        "operationalSpendMilliImd": 0,
+        "contentSpendMilliImd": 0,
+        "convertedMilliImd": 0,
+        "accumulatedDcp": 0,
+        "failedConversions": 0,
+        "dormantAtDay": 0,
+        "reserveDcp": 700000000,
+        "immutablePlayerClaimsDcp": 7000,
+        "prizesDcp": 0,
+        "conservation": true
+      }
+    }
+  }
+}

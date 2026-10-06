@@ -31,7 +31,7 @@ export function creditPurchase(db, log) {
       orderId, '', Number(sku), '0', 'orphaned', log.txHash, log.blockNumber, log.blockHash, BigInt(amount).toString(), buyer, Date.now(), Date.now());
     return 'orphaned';
   }
-  if (o.status === 'credited' || o.status === 'underpaid') return o.status;
+  if (o.status === 'credited') return o.status;
   const acct = one(db, 'SELECT wallet FROM accounts WHERE id = ?', o.account_id);
   const paid = BigInt(amount);
   const wrongBuyer = acct?.wallet && buyer && acct.wallet.toLowerCase() !== String(buyer).toLowerCase();
@@ -51,10 +51,8 @@ export function ownedSkus(db, accountId) {
 }
 
 export function consumeRevive(db, accountId) {
-  return tx(db, () => {
-    const r = one(db, "SELECT order_id FROM cosmetics WHERE account_id = ? AND sku = 4 AND order_id NOT LIKE 'used:%' LIMIT 1", accountId);
-    if (!r) return false;
-    run(db, 'UPDATE cosmetics SET order_id = ? WHERE order_id = ?', 'used:' + r.order_id, r.order_id);
-    return true;
-  });
+  // One atomic statement; also works inside GameService.act's transaction.
+  return !!one(db, `UPDATE cosmetics SET order_id = 'used:' || order_id
+    WHERE order_id = (SELECT order_id FROM cosmetics WHERE account_id = ? AND sku = 4
+    AND order_id NOT LIKE 'used:%' LIMIT 1) RETURNING order_id`, accountId);
 }

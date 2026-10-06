@@ -1,0 +1,16 @@
+{
+  "observedAt": "2026-10-06T21:07:32.632536+00:00",
+  "source": "https://api.imd.fun/version",
+  "readOnly": true,
+  "response": {
+    "commit": "94826a228854b3721c76687f38f4c64daedfce15",
+    "branch": "master",
+    "deployedAt": null,
+    "protocolVersion": 1,
+    "features": {
+      "scheduling": true,
+      "verificationQueue": true,
+      "startCommitAttribution": true
+    }
+  }
+}

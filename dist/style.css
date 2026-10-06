@@ -1,0 +1,67 @@
+:root { --bg:#0d0f0c; --panel:#151a13; --panel2:#1c2319; --line:#2a3326; --text:#e4ead9; --muted:#8c977f; --frog:#6fc04a; --blood:#d0413a; --gold:#e6b84a; --hype:#c86bd8; --block:#5fa8d3; }
+* { box-sizing: border-box; }
+html, body { margin:0; background:var(--bg); color:var(--text); font:15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+button { font:inherit; color:var(--text); background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:.5em .85em; cursor:pointer; }
+button:hover:not(:disabled) { border-color:var(--frog); }
+button:disabled { opacity:.45; cursor:not-allowed; }
+button.primary { background:var(--frog); color:#0b1408; border-color:var(--frog); font-weight:700; }
+button.danger { border-color:var(--blood); }
+input { font:inherit; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:.45em .6em; width:100%; margin:.3em 0 .8em; }
+a { color:var(--frog); }
+header { display:flex; flex-wrap:wrap; gap:.6rem; align-items:center; justify-content:space-between; padding:.6rem 1rem; border-bottom:1px solid var(--line); position:sticky; top:0; background:rgba(13,15,12,.95); z-index:5; }
+.brand { display:flex; gap:.6rem; align-items:center; }
+.brand small { display:block; color:var(--muted); font-size:.8rem; }
+.logo { font-size:1.8rem; }
+nav { display:flex; gap:.3rem; flex-wrap:wrap; }
+.tab.active { border-color:var(--frog); color:var(--frog); }
+.acct { display:flex; gap:.4rem; align-items:center; flex-wrap:wrap; font-size:.85rem; }
+main { padding:1rem; max-width:1400px; margin:0 auto; }
+footer { color:var(--muted); font-size:.75rem; text-align:center; padding:1rem; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:1rem; margin-bottom:1rem; }
+.muted, .small { color:var(--muted); font-size:.85rem; }
+.banner { background:#3a1715; border-bottom:1px solid var(--blood); padding:.5rem 1rem; }
+.modal { position:fixed; inset:0; background:rgba(0,0,0,.85); display:flex; align-items:center; justify-content:center; z-index:20; padding:1rem; }
+.modal .card { max-width:480px; }
+.game { display:grid; grid-template-columns: 300px 1fr 360px; gap:1rem; }
+@media (max-width: 1100px) { .game { grid-template-columns: 1fr; } .log { max-height:40vh; } }
+.sheet h2 { margin:.1rem 0; }
+.bar { height:10px; background:var(--bg); border-radius:6px; overflow:hidden; border:1px solid var(--line); margin:.2rem 0 .5rem; }
+.bar > i { display:block; height:100%; background:var(--blood); }
+.bar.hype > i { background:var(--hype); }
+.bar.xp > i { background:var(--frog); }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.3rem; font-size:.85rem; }
+.stats span b { color:var(--gold); }
+.powers { list-style:none; padding:0; margin:.4rem 0; max-height:36vh; overflow:auto; }
+.powers li { border-left:3px solid var(--line); padding:.25rem .5rem; margin:.25rem 0; font-size:.8rem; background:var(--panel2); border-radius:4px; }
+.powers li.Rare { border-color:var(--block); } .powers li.Epic { border-color:var(--hype); } .powers li.Unhinged { border-color:var(--gold); }
+.tag { display:inline-block; font-size:.7rem; border:1px solid var(--line); border-radius:99px; padding:0 .45em; margin:.1em; color:var(--muted); }
+.syn { color:var(--frog); font-size:.8rem; }
+.room h2 { margin-top:0; }
+.actions { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem; }
+.enemies { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.5rem; }
+.enemy { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:.5rem; font-size:.85rem; }
+.enemy.dead { opacity:.35; text-decoration:line-through; }
+.offers { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.6rem; }
+.offer { background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:.7rem; display:flex; flex-direction:column; gap:.4rem; }
+.offer.Rare { border-color:var(--block); } .offer.Epic { border-color:var(--hype); } .offer.Unhinged { border-color:var(--gold); box-shadow:0 0 14px rgba(230,184,74,.25); }
+.offer p { font-size:.85rem; margin:0; flex:1; }
+.map .layers { display:flex; gap:.5rem; overflow-x:auto; padding-bottom:.4rem; }
+.map .layer { display:flex; flex-direction:column; gap:.35rem; justify-content:center; }
+.node { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem; padding:0; }
+.node.here { border:2px solid var(--frog); box-shadow:0 0 10px var(--frog); }
+.node.visited { opacity:.45; }
+.node.reach { border-color:var(--gold); }
+.log { max-height:78vh; overflow:auto; font-size:.85rem; }
+.log p { margin:.25rem 0; padding-bottom:.25rem; border-bottom:1px dashed var(--line); }
+.classes { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.5rem; margin-bottom:.8rem; }
+.class { text-align:left; }
+.class.sel { border-color:var(--frog); background:#1e2d18; }
+.class small { display:block; color:var(--muted); }
+.roster { margin-top:1rem; }
+table { width:100%; border-collapse:collapse; font-size:.85rem; }
+td, th { padding:.35rem; border-bottom:1px solid var(--line); text-align:left; }
+.ok { color:var(--frog); } .warn { color:var(--gold); } .bad { color:var(--blood); }
+.prose li { margin:.3rem 0; }
+.inv { display:flex; flex-wrap:wrap; gap:.3rem; }
+.inv button { font-size:.75rem; padding:.3em .5em; }
+pre { white-space:pre-wrap; font-size:.75rem; color:var(--muted); }

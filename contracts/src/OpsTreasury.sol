@@ -43,6 +43,19 @@ contract OpsTreasury is TimelockedRoles {
     uint256 public immutable MAX_PAY_PER_EPOCH;
     uint256 public immutable MAX_SLIPPAGE_BPS;
     uint256 public immutable MAX_BOUNTY;
+    uint256 public immutable MAX_CONVERT_PER_EPOCH;
+    uint256 public immutable MAX_GAS_PER_EPOCH;
+    uint256 public immutable MIN_ESSENTIAL_FLOOR;
+    uint256 public constant MAX_WETH_PER_CALL = 0.05 ether;
+    uint256 public constant MAX_WETH_PER_EPOCH = 0.2 ether;
+    uint256 private entered;
+
+    modifier nonReentrant() {
+        require(entered == 0, "reentrant");
+        entered = 1;
+        _;
+        entered = 0;
+    }
 
     ISwapAdapter public swapAdapter;
     IPriceOracle public oracle;
@@ -124,6 +137,13 @@ contract OpsTreasury is TimelockedRoles {
         uint256[3] memory bounds, // maxPayPerEpoch, maxSlippageBps, maxBounty
         Params memory p
     ) TimelockedRoles(addrs[5], guardian_, delay_) {
+        require(
+            addrs[0] != address(0) && addrs[1] != address(0) && addrs[2] != address(0) && addrs[3] != address(0)
+                && addrs[4] != address(0),
+            "zero address"
+        );
+        require(addrs[0] != addrs[1] && addrs[0] != addrs[2] && addrs[1] != addrs[2], "same asset");
+        require(bounds[1] <= 1_000, "slippage bound");
         dcp = IERC20Min(addrs[0]);
         imd = IERC20Min(addrs[1]);
         weth = IERC20Min(addrs[2]);
@@ -133,6 +153,9 @@ contract OpsTreasury is TimelockedRoles {
         MAX_PAY_PER_EPOCH = bounds[0];
         MAX_SLIPPAGE_BPS = bounds[1];
         MAX_BOUNTY = bounds[2];
+        MAX_CONVERT_PER_EPOCH = p.convertPerEpoch;
+        MAX_GAS_PER_EPOCH = p.gasPerEpoch;
+        MIN_ESSENTIAL_FLOOR = p.essentialFloor;
         _setParams(p);
     }
 
@@ -144,7 +167,7 @@ contract OpsTreasury is TimelockedRoles {
 
     // ------------------------------------------------------------------ permissionless
 
-    function harvest() external {
+    function harvest() external nonReentrant {
         uint256 d0 = dcp.balanceOf(address(this));
         uint256 i0 = imd.balanceOf(address(this));
         uint256 w0 = weth.balanceOf(address(this)) + address(this).balance;
@@ -157,13 +180,13 @@ contract OpsTreasury is TimelockedRoles {
         );
     }
 
-    function wrapEth() external {
+    function wrapEth() external nonReentrant {
         uint256 bal = address(this).balance;
         if (bal <= gasReserve) revert NotNeeded();
         IWETH(address(weth)).deposit{value: bal - gasReserve}();
     }
 
-    function recycleDcp() external {
+    function recycleDcp() external nonReentrant {
         uint256 bal = dcp.balanceOf(address(this));
         if (bal <= dcpBuffer) revert NotNeeded();
         uint256 amt = bal - dcpBuffer;
@@ -171,22 +194,27 @@ contract OpsTreasury is TimelockedRoles {
         emit Recycled(amt);
     }
 
-    function convert(address tokenIn, uint256 amountIn, uint256 minOut) external returns (uint256 out) {
+    function convert(address tokenIn, uint256 amountIn, uint256 minOut) external nonReentrant returns (uint256 out) {
         if (frozen) revert IsFrozen();
         if (tokenIn != address(dcp) && tokenIn != address(weth)) revert BadAsset();
         if (imd.balanceOf(address(this)) >= replenishBelow) revert NotNeeded();
-        if (amountIn < dustFloor) revert Dust();
+        uint256 floor = tokenIn == address(weth) ? 0.001 ether : dustFloor;
+        if (amountIn == 0 || amountIn < floor) revert Dust();
         if (amountIn > convertPerCall) revert OverCap();
         uint256 e = epoch();
+        if (
+            tokenIn == address(weth)
+                && (amountIn > MAX_WETH_PER_CALL || convertedInEpoch[e][tokenIn] + amountIn > MAX_WETH_PER_EPOCH)
+        ) revert OverCap();
         if (convertedInEpoch[e][tokenIn] + amountIn > convertPerEpoch) revert OverCap();
         uint256 fair = oracle.quote(tokenIn, address(imd), amountIn);
-        if (minOut < (fair * (10_000 - slippageBps)) / 10_000) revert MinOutTooLow();
+        if (fair == 0 || minOut == 0 || minOut < (fair * (10_000 - slippageBps)) / 10_000) revert MinOutTooLow();
         convertedInEpoch[e][tokenIn] += amountIn;
 
         uint256 before = imd.balanceOf(address(this));
-        IERC20Min(tokenIn).approve(address(swapAdapter), amountIn);
+        if (!IERC20Min(tokenIn).approve(address(swapAdapter), amountIn)) revert TransferFailed();
         swapAdapter.swapExactIn(tokenIn, address(imd), amountIn, minOut, address(this));
-        IERC20Min(tokenIn).approve(address(swapAdapter), 0);
+        if (!IERC20Min(tokenIn).approve(address(swapAdapter), 0)) revert TransferFailed();
         out = imd.balanceOf(address(this)) - before;
         if (out < minOut) revert ShortOutput();
 
@@ -195,7 +223,7 @@ contract OpsTreasury is TimelockedRoles {
         emit Converted(tokenIn, amountIn, out, msg.sender, b);
     }
 
-    function topUpGas(address op) external {
+    function topUpGas(address op) external nonReentrant {
         if (!gasOperators[op]) revert NotPayee();
         if (op.balance >= gasLow) revert NotNeeded();
         uint256 e = epoch();
@@ -209,8 +237,9 @@ contract OpsTreasury is TimelockedRoles {
 
     // ------------------------------------------------------------------ payment signer
 
-    function payWork(address payee, uint256 amount, bytes32 invoiceId) external {
+    function payWork(address payee, uint256 amount, bytes32 invoiceId) external nonReentrant {
         if (msg.sender != paymentSigner) revert NotSigner();
+        if (amount == 0 || invoiceId == bytes32(0)) revert OutOfBounds();
         if (frozen) revert IsFrozen();
         if (!payees[payee]) revert NotPayee();
         if (invoicePaid[invoiceId]) revert DuplicateInvoice();
@@ -267,6 +296,11 @@ contract OpsTreasury is TimelockedRoles {
     }
 
     function _setParams(Params memory p) private {
+        if (
+            p.convertPerEpoch > MAX_CONVERT_PER_EPOCH || p.convertPerCall > p.convertPerEpoch
+                || p.gasPerEpoch > MAX_GAS_PER_EPOCH || p.essentialFloor < MIN_ESSENTIAL_FLOOR
+                || p.lowRunway < p.essentialFloor || p.replenishBelow < p.lowRunway
+        ) revert OutOfBounds();
         if (p.payPerEpoch > MAX_PAY_PER_EPOCH) revert OutOfBounds();
         if (p.payPerPayment > p.payPerEpoch) revert OutOfBounds();
         if (p.slippageBps > MAX_SLIPPAGE_BPS) revert OutOfBounds();

@@ -1,7 +1,7 @@
 // Wires the services together and exposes the HTTP API + static frontend.
 import { createServer } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import { join, normalize, extname } from 'node:path';
+import { join, resolve, relative, extname, sep } from 'node:path';
 import { randomBytes, createHash } from 'node:crypto';
 import { openDb, one, all, run, getMeta, setMeta } from './db.js';
 import { GameService, GameError } from './game/service.js';
@@ -37,6 +37,9 @@ class RateLimiter {
 }
 
 export function createApp(cfg) {
+  if (!cfg.demo || (cfg.chain && cfg.chain.kind !== 'sim') || cfg.contracts || cfg.paidAuthor) {
+    throw new Error('BUILD-AND-REVIEW only: use the labelled local simulation; real payments and launch are disabled');
+  }
   const db = cfg.db ?? openDb(cfg.dbPath);
   let secret = cfg.secret;
   if (!secret) {
@@ -48,7 +51,7 @@ export function createApp(cfg) {
   const clockOffset = () => (cfg.demo ? getMeta(db, 'demoClockOffset', 0) : 0);
   const now = () => Date.now() + clockOffset();
   const game = new GameService({ db, secret, dayMs: cfg.dayMs ?? 86400_000, now });
-  const chain = cfg.chain ?? new SimChain({ now, challengeSecs: Math.floor((cfg.econ?.challengeMs ?? 86400_000) / 1000) });
+  const chain = cfg.chain ?? new SimChain({ db, now, challengeSecs: Math.floor((cfg.econ?.challengeMs ?? 86400_000) / 1000) });
   const econCfg = { ...defaultEconomyConfig(), ...(cfg.econ ?? {}) };
   const budgetCfg = { ...defaultBudgetConfig(), ...(cfg.budget ?? {}) };
   const indexer = new Indexer({ db, chain, confirmations: cfg.confirmations ?? 12, onPurchase: (l) => creditPurchase(db, l), onClaim: (l) => markClaimed(db, l), log: cfg.log });
@@ -106,6 +109,7 @@ export function createApp(cfg) {
       return { nonce, message: siweMessage({ domain: authCfg.domain, uri: authCfg.uri, address, chainId: authCfg.chainId, nonce, issuedAt, expirationTime }) };
     },
     'POST /api/auth/verify': async (req) => {
+      if (!authLimiter.take('verify:' + ipOf(req))) throw new HttpError(429, 'slow down');
       const b = await body(req);
       const h = req.headers.authorization ?? '';
       const cur = sessionFrom(db, h.startsWith('Bearer ') ? h.slice(7) : null);
@@ -191,6 +195,7 @@ export function createApp(cfg) {
     'POST /api/demo/advance': async (req) => {
       demoOnly();
       const { hours = 24 } = await body(req);
+      if (!Number.isFinite(hours) || hours < 1 || hours > 72) throw new HttpError(400, 'hours must be a number from 1 to 72');
       setMeta(db, 'demoClockOffset', clockOffset() + Math.min(72, Math.max(1, Number(hours))) * 3600_000);
       for (let i = 0; i < 5; i++) chain.trade(i % 2 === 0, (20_000n + BigInt(i) * 3_000n) * E18);
       chain.mine(indexer.confirmations + 2);
@@ -207,8 +212,9 @@ export function createApp(cfg) {
     if (!webRoot) return false;
     let p = decodeURIComponent(url.pathname);
     if (p.endsWith('/')) p += 'index.html';
-    const file = normalize(join(webRoot, p));
-    if (!file.startsWith(normalize(webRoot))) return false;
+    const file = resolve(webRoot, '.' + p);
+    const rel = relative(resolve(webRoot), file);
+    if (rel === '..' || rel.startsWith('..' + sep)) return false;
     if (!existsSync(file) || !statSync(file).isFile()) return false;
     res.writeHead(200, { 'content-type': MIME[extname(file)] ?? 'application/octet-stream', 'cache-control': p.endsWith('.html') ? 'no-cache' : 'public, max-age=300', ...SECURITY_HEADERS });
     res.end(readFileSync(file));
@@ -216,6 +222,7 @@ export function createApp(cfg) {
   }
 
   const handler = async (req, res) => {
+    try {
     const url = new URL(req.url, 'http://local');
     const key = `${req.method} ${url.pathname}`;
     const route = routes[key];
@@ -232,6 +239,7 @@ export function createApp(cfg) {
       cfg.log?.(`500 ${key}: ${e.stack ?? e.message}`);
       send(res, 500, { error: 'internal error' });
     }
+    } catch { if (!res.headersSent) send(res, 400, { error: 'invalid request' }); else res.end(); }
   };
 
   return { db, game, chain, keeper, indexer, handler, now, listen: (port, host) => new Promise((r) => { const srv = createServer(handler); srv.listen(port, host, () => r(srv)); }), rollback: (v, m) => rollback(db, v, m) };
@@ -247,4 +255,3 @@ function send(res, status, obj) {
   res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...SECURITY_HEADERS });
   res.end(JSON.stringify(obj));
 }
-

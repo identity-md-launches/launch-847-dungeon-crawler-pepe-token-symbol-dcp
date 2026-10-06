@@ -627,6 +627,27 @@ export function act(ctx, ch, action) {
       say(ch, `🧥 Equipped ${it.name}.`);
       break;
     }
+    case 'craft': {
+      need(!p || p.kind !== 'combat', 'The flesh-smith refuses to operate during combat.');
+      const left = ch.items.find((i) => i.id === action.left);
+      const right = ch.items.find((i) => i.id === action.right);
+      need(left && right && left !== right && left.slot === right.slot, 'Splicing needs two different unequipped items of the same slot.');
+      need(action.inherit === 'left' || action.inherit === 'right', 'Choose which item donates its power.');
+      const cost = 30 + 10 * Math.max(left.tier, right.tier);
+      need(ch.gold >= cost, `The flesh-smith charges ${cost} gold. No instalments, you cheap bastard.`);
+      const donor = action.inherit === 'left' ? left : right;
+      const shell = action.inherit === 'left' ? right : left;
+      // Deliberate trade-off: one item's power, the OTHER item's stats. No stacking or
+      // stat escalation loop; both originals are consumed, including the other power.
+      const item = { ...shell, id: `splice_${ch.turn}`, name: `Notarised ${shell.name.slice(0, 70)}`,
+        power: donor.power ? { ...donor.power } : undefined, soulbound: true };
+      ch.gold -= cost;
+      ch.items = ch.items.filter((i) => i !== left && i !== right);
+      ch.items.push(item);
+      ch.flags.fleshsmith = 'debtor';
+      say(ch, `🪡 Stitch-Mother staples a power into ${item.name}. Two items and ${cost} gold gone. "If it screams, that's the warranty."`);
+      break;
+    }
     case 'discard': {
       const before = ch.items.length;
       ch.items = ch.items.filter((i) => i.id !== action.choice);

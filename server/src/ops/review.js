@@ -18,7 +18,14 @@ const BAD_PATTERNS = [
   [/\b(child|minor|underage|kid)s?\b.*\b(sex|nude|naked|erotic)/i, 'sexual content involving minors'],
   [/\b(n[i1]gg|f[a@]gg?ot|k[i1]ke|tr[a@]nny|sp[i1]c|ch[i1]nk)/i, 'slur'],
 ];
-const ALLOWED_KEYS = new Set(['id', 'version', 'author', 'effects', 'monsterBodies', 'biomes', 'dailyEvents', 'callbacks', 'quests', 'monsterAffixes', 'afflictions']);
+const ALLOWED_KEYS = new Set(['id', 'version', 'author', 'effects', 'monsterBodies', 'biomes', 'dailyEvents', 'callbacks']);
+const FIELDS = {
+  effects: ['id', 'kind', 'base', 'tags', 'text'],
+  monsterBodies: ['id', 'name', 'hp', 'atk', 'text'],
+  biomes: ['id', 'name', 'text'],
+  dailyEvents: ['id', 'name', 'text', 'mod'],
+  callbacks: ['when', 'line'],
+};
 const MOD_BOUNDS = { goldMult: [0.7, 1.5], xpMult: [0.8, 1.5], hypeMult: [0.5, 2.5], eliteMult: [0.5, 3], combatMult: [0.5, 1.5], enemyHp: [0.8, 1.3], restMult: [0.5, 2], sponsorMult: [0.5, 2.5], lootUp: [0, 1] };
 const BASE_BOUNDS = { damage: [2, 9], poison: [1, 5], bleed: [1, 5], burn: [1, 5], heal: [2, 8], shield: [2, 8], gold: [2, 8], minion: [1, 4], hype: [1, 6], stun: [1, 1], weaken: [1, 3], reflect: [1, 4], drain: [2, 6], chaos: [4, 9], extra_action: [1, 1], crit_chance: [5, 12] };
 
@@ -33,6 +40,17 @@ export function reviewPack(pack, existing, tags) {
   const problems = [];
   if (!pack || typeof pack !== 'object') return { ok: false, problems: ['not an object'] };
   for (const k of Object.keys(pack)) if (!ALLOWED_KEYS.has(k)) problems.push(`unknown key ${k}`);
+  for (const [list, fields] of Object.entries(FIELDS)) {
+    if (pack[list] === undefined) continue;
+    if (!Array.isArray(pack[list]) || pack[list].length > 12) { problems.push(`${list}: bounded array required`); continue; }
+    for (const item of pack[list]) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) { problems.push(`${list}: object required`); continue; }
+      for (const k of Object.keys(item)) if (!fields.includes(k)) problems.push(`${list}: unknown field ${k}`);
+      if (['__proto__', 'constructor', 'prototype'].includes(item.id)) problems.push('reserved id');
+    }
+  }
+  // Fail closed before interpreting malformed shapes.
+  if (problems.length) return { ok: false, problems };
   if (!idOk(pack.id)) problems.push('bad pack id');
   const size = JSON.stringify(pack).length;
   if (size > 50_000) problems.push('pack too large');
@@ -50,7 +68,7 @@ export function reviewPack(pack, existing, tags) {
   }
   for (const m of pack.monsterBodies ?? []) {
     uniq(m.id, `monster ${m.id}`);
-    if (!(m.hp >= 8 && m.hp <= 32 && m.atk >= 2 && m.atk <= 7)) problems.push(`monster ${m.id}: stats out of bounds`);
+    if (!(Number.isInteger(m.hp) && Number.isInteger(m.atk) && m.hp >= 8 && m.hp <= 32 && m.atk >= 2 && m.atk <= 7)) problems.push(`monster ${m.id}: stats out of bounds`);
     textOk(m.name, `monster ${m.id} name`, problems);
     textOk(m.text, `monster ${m.id}`, problems);
   }
@@ -59,14 +77,18 @@ export function reviewPack(pack, existing, tags) {
     uniq(ev.id, `event ${ev.id}`);
     textOk(ev.name, `event ${ev.id} name`, problems);
     textOk(ev.text, `event ${ev.id}`, problems);
+    if (!ev.mod || typeof ev.mod !== 'object' || Array.isArray(ev.mod)) problems.push('event: modifier object required');
     for (const [k, v] of Object.entries(ev.mod ?? {})) {
       const b = MOD_BOUNDS[k];
-      if (!b || typeof v !== 'number' || v < b[0] || v > b[1]) problems.push(`event ${ev.id}: modifier ${k} out of bounds`);
+      if (!b || !Number.isFinite(v) || v < b[0] || v > b[1]) problems.push(`event ${ev.id}: modifier ${k} out of bounds`);
     }
   }
   for (const c of pack.callbacks ?? []) {
     textOk(c.line, 'callback', problems);
     if (!c.when || typeof c.when !== 'object' || Object.keys(c.when).length === 0) problems.push('callback: missing condition');
+    for (const [key, value] of Object.entries(c.when ?? {})) {
+      if (!/^[a-z][a-z0-9_]{0,32}$/.test(key) || ['constructor', 'prototype'].includes(key) || typeof value !== 'string' || value.length > 40) problems.push('callback: invalid flag');
+    }
   }
   if ((pack.quests ?? []).length) problems.push('quests: swarm-authored quests require the v2 quest schema (not enabled in this build)');
   const counts = (pack.effects?.length ?? 0) + (pack.monsterBodies?.length ?? 0) + (pack.biomes?.length ?? 0) + (pack.dailyEvents?.length ?? 0);

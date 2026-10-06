@@ -1,0 +1,546 @@
+Final local checks. Implementer evidence only. Static export HTTP and backup/restore CLI smoke: PASS.
+
+forge build
+Compiling 1 files with Solc 0.8.26
+Solc 0.8.26 finished in 2.15s
+Compiler run successful!
+warning[uninitialized-local]: local variable is read before being initialized
+   ╭▸ contracts/src/DCPToken.sol:36:13
+   │
+36 │             sum += amounts[i];
+   │             ━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/uninitialized-local
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+   ╭▸ contracts/src/DCPToken.sol:34:46
+   │
+34 │             if (recipients[i] == address(0)) revert ZeroAddress();
+   │                                              ━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:174:9
+    │
+174 │         factory.claimFees(launchId);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:175:9
+    │
+175 │         factory.withdraw(launchId);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/OpsTreasury.sol:176:9
+    │
+176 │ ┏         emit Harvested(
+177 │ ┃             dcp.balanceOf(address(this)) - d0,
+178 │ ┃             imd.balanceOf(address(this)) - i0,
+179 │ ┃             weth.balanceOf(address(this)) + address(this).balance - w0
+180 │ ┃         );
+    │ ┗━━━━━━━━━━┛
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ contracts/src/TimelockedRoles.sol:57:13
+   │
+57 │         if (block.timestamp < eta) revert TooEarly();
+   │             ━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:193:14
+    │
+193 │         if (!dcp.transfer(reserve, amt)) revert TransferFailed();
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ contracts/src/TimelockedRoles.sol:61:9
+   │
+61 │         emit Executed(id, data);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/OpsTreasury.sol:194:9
+    │
+194 │         emit Recycled(amt);
+    │         ━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:215:14
+    │
+215 │         if (!IERC20Min(tokenIn).approve(address(swapAdapter), amountIn)) revert TransferFailed();
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:216:9
+    │
+216 │         swapAdapter.swapExactIn(tokenIn, address(imd), amountIn, minOut, address(this));
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:217:14
+    │
+217 │         if (!IERC20Min(tokenIn).approve(address(swapAdapter), 0)) revert TransferFailed();
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:222:23
+    │
+222 │         if (b > 0 && !imd.transfer(msg.sender, b)) revert TransferFailed();
+    │                       ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/OpsTreasury.sol:223:9
+    │
+223 │         emit Converted(tokenIn, amountIn, out, msg.sender, b);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/src/OpsTreasury.sol:216:9
+    │
+216 │         swapAdapter.swapExactIn(tokenIn, address(imd), amountIn, minOut, address(this));
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/unused-return
+
+warning[arbitrary-send-eth]: ETH is sent to a user-controlled destination; restrict the destination or the caller
+    ╭▸ contracts/src/OpsTreasury.sol:233:22
+    │
+233 │         (bool ok,) = op.call{value: gasTopUp}("");
+    │                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/arbitrary-send-eth
+
+warning[reentrancy-eth]: uncapped ETH transfer can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:233:22
+    │
+233 │         (bool ok,) = op.call{value: gasTopUp}("");
+    │                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-eth
+
+warning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check
+    ╭▸ contracts/src/OpsTreasury.sol:226:23
+    │
+226 │     function topUpGas(address op) external nonReentrant {
+    │                       ━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/missing-zero-check
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/OpsTreasury.sol:235:9
+    │
+235 │         emit GasToppedUp(op, gasTopUp);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/src/VRFPrizeSource.sol:30:45
+   │
+30 │     bytes4 private constant EXTRA_ARGS_V1 = bytes4(keccak256("VRF ExtraArgsV1"));
+   │                                             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │       
+   │       // casting to 'bytes4' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │       
+   │       
+   ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ contracts/src/VRFPrizeSource.sol:68:9
+   │
+68 │         emit Requested(epoch, id);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-no-eth]: external call can be reentered before `entered` is updated
+    ╭▸ contracts/src/OpsTreasury.sol:254:14
+    │
+254 │         if (!imd.transfer(payee, amount)) revert TransferFailed();
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-no-eth
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/OpsTreasury.sol:255:9
+    │
+255 │         emit WorkPaid(invoiceId, payee, amount);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check
+   ╭▸ contracts/src/GameReserve.sol:86:9
+   │
+86 │         address poster_,
+   │         ━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/missing-zero-check
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ contracts/src/GameShop.sol:50:9
+   │
+50 │         emit Purchase(msg.sender, orderId, sku, amount);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/GameReserve.sol:143:9
+    │
+143 │         emit DrawRequested(epoch, snapshotHash);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/src/GameReserve.sol:174:25
+    │
+174 │         r.anchorBlock = uint64(block.number);
+    │                         ━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint64' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check
+    ╭▸ contracts/src/OpsTreasury.sol:287:31
+    │
+287 │     function setPaymentSigner(address s) external onlySelf {
+    │                               ━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/missing-zero-check
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/src/GameReserve.sol:203:19
+    │
+203 │         r.total = uint128(total);
+    │                   ━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/src/GameReserve.sol:204:22
+    │
+204 │         r.postedAt = uint64(block.timestamp);
+    │                      ━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint64' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ contracts/src/GameReserve.sol:216:13
+    │
+216 │         if (block.timestamp >= r.postedAt + CHALLENGE_WINDOW) revert InWindow();
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[calls-loop]: external call inside a loop
+    ╭▸ contracts/src/GameReserve.sol:252:14
+    │
+252 │         if (!token.transfer(account, amount)) revert TransferFailed();
+    │              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/calls-loop
+
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/src/GameReserve.sol:253:9
+    │
+253 │         emit Claimed(epoch, index, account, amount);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/reentrancy-events
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:242:35
+    │
+242 │         if (r.root == bytes32(0)) revert NotReady();
+    │                                   ━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:243:23
+    │
+243 │         if (r.vetoed) revert Vetoed();
+    │                       ━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:244:62
+    │
+244 │         if (block.timestamp < r.postedAt + CHALLENGE_WINDOW) revert InWindow();
+    │                                                              ━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:245:38
+    │
+245 │         if (isClaimed(epoch, index)) revert AlreadyClaimed();
+    │                                      ━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:247:44
+    │
+247 │         if (!_verify(proof, r.root, leaf)) revert BadProof();
+    │                                            ━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:248:52
+    │
+248 │         if (uint256(r.claimed) + amount > r.total) revert OverCap();
+    │                                                    ━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[require-revert-in-loop]: `require` or `revert` inside a loop
+    ╭▸ contracts/src/GameReserve.sol:252:47
+    │
+252 │         if (!token.transfer(account, amount)) revert TransferFailed();
+    │                                               ━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/require-revert-in-loop
+
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ contracts/src/GameReserve.sol:244:13
+    │
+244 │         if (block.timestamp < r.postedAt + CHALLENGE_WINDOW) revert InWindow();
+    │             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/block-timestamp
+
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/src/GameReserve.sol:250:22
+    │
+250 │         r.claimed += uint128(amount);
+    │                      ━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │       
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │       
+    │       
+    ╰ help: https://getfoundry.sh/forge/linting/unsafe-typecast
+
+warning[missing-zero-check]: address parameter is used in a state write or value transfer without a zero-address check
+    ╭▸ contracts/src/GameReserve.sol:258:24
+    │
+258 │     function setPoster(address p) external onlySelf {
+    │                        ━━━━━━━━━
+    │
+    ╰ help: https://getfoundry.sh/forge/linting/missing-zero-check
+
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ contracts/test/Base.t.sol:112:17
+    │
+112 │         vm.warp(block.timestamp + 2 days);
+    │         ────────━━━━━━━━━━━━━━━────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+warning[environment-read-across-mutation]: `block.number` may be reused across `vm.roll`
+    ╭▸ contracts/test/Reserve.t.sol:157:21
+    │
+157 │             vm.roll(block.number + 2);
+    │             ────────━━━━━━━━━━━━───── `vm.roll` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockNumber()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ contracts/test/Treasury.t.sol:182:17
+    │
+182 │         vm.warp(block.timestamp + 3 days);
+    │         ────────━━━━━━━━━━━━━━━────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ contracts/test/Treasury.t.sol:192:17
+    │
+192 │         vm.warp(block.timestamp + 3 days);
+    │         ────────━━━━━━━━━━━━━━━────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+
+
+forge test
+No files changed, compilation skipped
+
+Ran 10 tests for contracts/test/Hardening.t.sol:HardeningTest
+[PASS] test_BlockhashFixtureUnavailableOnMainnet() (gas: 55670)
+[PASS] test_CouncilCannotRaiseHardGasCapOrSpendEssentialFloor() (gas: 209922)
+[PASS] test_DeployFixtureUsesArgumentsNotCaller() (gas: 15749823)
+[PASS] test_GasRecipientCannotReenterAndDrainMultipleTopups() (gas: 446574)
+[PASS] test_OrderFrontRunnerCannotConsumeAnotherBuyerOrder() (gas: 354906)
+[PASS] test_RequestsAndBackloggedRootsCannotBurstDailyBudget() (gas: 856370)
+[PASS] test_UnfundedVRFDoesNotLockSnapshotOrSpendReserve() (gas: 360956)
+[PASS] test_VRFWaitAuthenticateNoRerollLateFulfillmentAndClaims() (gas: 851326)
+[PASS] test_WethUsesItsOwnDustAndSpendCaps() (gas: 353694)
+[PASS] test_ZeroOracleOutputPreservesFunds() (gas: 182036)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 8.03ms (2.46ms CPU time)
+
+Ran 7 tests for contracts/test/TokenAndFees.t.sol:TokenAndFeesTest
+[PASS] testFuzz_PlainTransferNoTax(uint256) (runs: 256, μ: 74828, ~: 74656)
+[PASS] test_AllocationMustSumToSupply() (gas: 4743)
+[PASS] test_FeesRouteBothAssetsToTreasury() (gas: 738095)
+[PASS] test_NoMintOwnerPauseUpgradeSelectors() (gas: 140303)
+[PASS] test_SetRequesterOnlyOnceByLauncher() (gas: 67664)
+[PASS] test_ShopSplitBurnReserveTreasury() (gas: 266248)
+[PASS] test_SupplyAndAllocationExact() (gas: 79724)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 12.75ms (10.81ms CPU time)
+
+Ran 10 tests for contracts/test/Reserve.t.sol:ReserveTest
+[PASS] test_ClaimManyBatchesAndBlocksDuplicates() (gas: 574093)
+[PASS] test_DormancyKeepsFinalClaims() (gas: 584104)
+[PASS] test_FullCycleClaimOnceToLeafAccount() (gas: 726014)
+[PASS] test_GuardianVetoReleasesLiability() (gas: 493423)
+[PASS] test_LeafEncodingVector() (gas: 650)
+[PASS] test_MaxEmissionNeverEmptiesReserve() (gas: 22725080)
+[PASS] test_NoWithdrawPathForCouncil() (gas: 136143)
+[PASS] test_PostOverCapReverts() (gas: 269516)
+[PASS] test_RevealExpiresAfter256Blocks() (gas: 165535)
+[PASS] test_SeedMustBeCommittedBeforeEpochAndMatch() (gas: 191944)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 12.97ms (10.76ms CPU time)
+
+Ran 14 tests for contracts/test/Treasury.t.sol:TreasuryTest
+[PASS] testFuzz_NeverOverspendEpoch(uint256[8]) (runs: 256, μ: 704722, ~: 701491)
+[PASS] test_ConvertCapsDustAndRunwayGate() (gas: 362234)
+[PASS] test_ConvertDcpFeesWhenRunwayLow() (gas: 302962)
+[PASS] test_ConvertEpochCap() (gas: 584179)
+[PASS] test_ConvertRejectsLowMinOutAndPreservesFundsOnFailure() (gas: 680955)
+[PASS] test_EndToEndFeeToTreasuryToPaidWork() (gas: 2244829)
+[PASS] test_EssentialFloorProtected() (gas: 262892)
+[PASS] test_FreezeStopsSpendingAndNeedsTimelockToLift() (gas: 393340)
+[PASS] test_GasTopUpBounded() (gas: 201708)
+[PASS] test_PayWorkAuthority() (gas: 233827)
+[PASS] test_PayWorkCapsAndLowRunway() (gas: 892052)
+[PASS] test_PayWorkHappyPathAndDuplicateInvoice() (gas: 267545)
+[PASS] test_RecycleExcessDcpToReserve() (gas: 133045)
+[PASS] test_TreasuryAttacksFail() (gas: 390570)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 33.45ms (31.03ms CPU time)
+
+Ran 4 test suites in 34.91ms (67.20ms CPU time): 41 tests passed, 0 failed, 0 skipped (41 total tests)
+
+
+forge fmt --check
+
+
+node --test test/*.test.mjs
+✔ keccak256 matches cast (2.359247ms)
+✔ address derivation and personal_sign round-trip match cast (17.990584ms)
+✔ Merkle leaf encoding matches GameReserve (shared vector with Reserve.t.sol) (1.753899ms)
+✔ ABI calldata matches cast (0.823098ms)
+✔ EIP-1559 signing matches cast (cast decode-transaction recovers the anvil signer) (4.126881ms)
+✔ same seed + same choices replays identically (retries/reloads cannot reroll) (99.647471ms)
+✔ different characters diverge: routes, offers and encounters differ (0.800996ms)
+✔ every generated offer is a valid, budgeted, distinct combination (25.532056ms)
+✔ substantial play across all archetypes and classes runs without engine faults (920.760415ms)
+✔ illegal engine moves are rejected (service tests verify transactional rollback) (5.900417ms)
+✔ depth gate blocks descending past the daily limit; Overtime keeps play going (0.569912ms)
+✔ full power slots require an explicit replacement (0.512634ms)
+✔ death is permanent for the character and recorded (1.494551ms)
+✔ quest choices write history that later callbacks and floors react to (0.686511ms)
+✔ authoritative save, retry identity, stale tab, unauthorized access and recovery (217.959335ms)
+✔ wallet authentication binds nonce, domain, network, expiry, and existing guest save (32.707552ms)
+✔ purchases require finality; underpayment cannot block correct buyer; retries never duplicate inventory (6.633616ms)
+✔ revive is atomic, consumed once and removes the run from rankings (3.386008ms)
+✔ crafting consumes owned items and gold; selects power versus stats; invalid craft rolls back (4.212612ms)
+✔ restart and consistent backup retain character, inventory, balances and chain cursor (70.882435ms)
+✔ shallow reorg never credits; deep reorg halts settlement and preserves evidence (7.224297ms)
+✔ two unattended cycles persist versions, preserve old encounters, and survive rollback (597.039821ms)
+✔ invalid and injected packs cannot publish or execute; rejected work is durable (6.729085ms)
+✔ fee income funds one work invoice; conflict, retries, operator loss and caps preserve custody (8.208047ms)
+✔ milestone caps preserve pending amounts; simulated final claims survive keeper loss (7.706734ms)
+✔ HTTP demo serves static frontend, API actions and safe malformed requests; launch disabled (76.143639ms)
+✔ lost commit response resumes from durable seed intent without rerolling (5.928088ms)
+✔ stress scenarios conserve funds, protect claims and stop unfunded operation (1.508517ms)
+✔ 120 players × 4 days: no convergence (15122.854736ms)
+✔ injected wallet authenticates separately and invalidates account/network changes (2.785749ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15383.970662
+
+
+forge script contracts/script/DeployLocal.s.sol
+Compiling 1 files with Solc 0.8.26
+Solc 0.8.26 finished in 1.34s
+Compiler run successful!
+Warning: Detected artifacts built from source files that no longer exist. Run `forge clean` to make sure builds are in sync with project files.
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper33.sol
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper35.sol
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper29.sol
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper34.sol
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper24.sol
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper23.sol
+ - /home/imd/.identitymd/work/2326d0a9-6edd-433b-9c9b-459cea784cfb/655d2743-30ef-4224-b71c-8f6a08cd5691/foundry-pp/DeployHelper28.sol
+Script ran successfully.
+Gas used: 8256141
+
+== Logs ==
+  DCP 0x45127f27819f45d1b72ef80e9a151a9DC8470207
+  GameReserve 0x89d319e6798816baCC38D6B4f7b2B490d5acaEb3
+  OpsTreasury 0xd26cAA59c4E6f180797be4A2bf56f6f47DEB5755
+  GameShop 0xb0ef3f1ac2AF8BB1A6d8A529E3e0ff124e655BB5
+  MockIMDFactory 0xa40a556c824de3b0E08B454E5cc1c9E29B3540ED

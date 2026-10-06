@@ -3,16 +3,17 @@ pragma solidity 0.8.26;
 
 import {IERC20Min} from "./interfaces/IERC20Min.sol";
 import {TimelockedRoles} from "./TimelockedRoles.sol";
+import {IPrizeRandomness} from "./interfaces/IPrizeRandomness.sol";
 
 /// @title GameReserve
 /// @notice Holds the DCP game reserve (70% of supply) and pays player prizes.
 ///
 /// Flow per epoch (1 day):
-///  1. Before the epoch starts the poster commits keccak256(seed) (commitSeed).
-///  2. After the epoch ends anyone calls anchor(); the next block's hash becomes public entropy.
-///  3. Poster reveals seed within 256 blocks; randomness = keccak256(seed, blockhash(anchor+1)).
-///     Neither the server (doesn't know the blockhash) nor a block proposer (doesn't know seed)
-///     controls it. The off-chain prize draw is recomputable from published data + randomness.
+///  1. After an epoch ends, requestDraw locks its eligibility snapshot hash and requests VRF.
+///  2. The configured source authenticates the asynchronous coordinator fulfillment.
+///  3. Anyone can finalizeDraw; no cancellation, replacement request or secret reveal is needed.
+///     Legacy commit/anchor/reveal exists ONLY on local chain 31337 for fixture compatibility.
+///     It is biased by withholding and MUST NOT be used for valuable prizes.
 ///  4. Poster posts a Merkle root of (index, account, amount) with its total. The total is capped
 ///     on-chain by min(EPOCH_ABS_CAP, freeBalance * EPOCH_BPS / 10000) — a geometric emission
 ///     that can never empty the reserve. The total is reserved as a liability immediately.
@@ -33,6 +34,11 @@ contract GameReserve is TimelockedRoles {
     address public poster;
     uint256 public outstanding; // posted, not-vetoed, not-yet-claimed liabilities
     uint256 public lastPostedEpoch;
+    IPrizeRandomness public randomnessSource;
+    mapping(uint256 => bytes32) public eligibilityHash;
+    mapping(uint256 => uint256) public postedInDay;
+    mapping(uint256 => uint256) public postingDayCap;
+    mapping(uint256 => bool) public drawRequestedInDay;
 
     struct Round {
         bytes32 seedHash;
@@ -68,6 +74,10 @@ contract GameReserve is TimelockedRoles {
     error AlreadyClaimed();
     error BadProof();
     error TransferFailed();
+    error LocalFixtureOnly();
+    event DrawRequested(uint256 indexed epoch, bytes32 snapshotHash);
+    event DrawFinalized(uint256 indexed epoch, bytes32 randomness);
+    event RandomnessSourceSet(address source);
 
     constructor(
         address token_,
@@ -79,6 +89,8 @@ contract GameReserve is TimelockedRoles {
         uint256 epochBps_,
         uint256 epochAbsCap_
     ) TimelockedRoles(council_, guardian_, delay_) {
+        require(token_ != address(0) && challengeWindow_ >= 1 hours, "invalid reserve");
+        require(epochAbsCap_ > 0 && epochAbsCap_ <= type(uint128).max, "invalid cap");
         require(epochBps_ <= 100, "bps>1%"); // hard ceiling: never more than 1%/day
         token = IERC20Min(token_);
         poster = poster_;
@@ -110,10 +122,44 @@ contract GameReserve is TimelockedRoles {
 
     // ------------------------------------------------------------------ poster
 
+    /// One-time binding. A new provider requires a separately reviewed reserve migration.
+    function setRandomnessSource(address source) external onlySelf {
+        if (address(randomnessSource) != address(0) || source.code.length == 0) revert AlreadySet();
+        randomnessSource = IPrizeRandomness(source);
+        emit RandomnessSourceSet(source);
+    }
+
+    /// Snapshot contains eligibility, weights, rules version and budgets, frozen BEFORE VRF.
+    /// Its publication/validity still requires an independent score reviewer and guardian.
+    function requestDraw(uint256 epoch, bytes32 snapshotHash) external {
+        if (msg.sender != poster) revert NotPoster();
+        if (epoch == 0 || epoch >= currentEpoch() || epoch <= lastPostedEpoch) revert BadEpoch();
+        if (address(randomnessSource) == address(0) || snapshotHash == bytes32(0)) revert NotReady();
+        if (eligibilityHash[epoch] != bytes32(0) || rounds[epoch].seedHash != bytes32(0)) revert AlreadySet();
+        if (drawRequestedInDay[currentEpoch()]) revert OverCap();
+        drawRequestedInDay[currentEpoch()] = true;
+        eligibilityHash[epoch] = snapshotHash;
+        randomnessSource.request(epoch);
+        emit DrawRequested(epoch, snapshotHash);
+    }
+
+    function finalizeDraw(uint256 epoch) external {
+        if (eligibilityHash[epoch] == bytes32(0)) revert NotReady();
+        if (rounds[epoch].randomness != bytes32(0)) revert AlreadySet();
+        (bool fulfilled, bytes32 word) = randomnessSource.result(epoch);
+        if (!fulfilled) revert NotReady();
+        // Domain-separated hash also permits a legitimate all-zero VRF word.
+        bytes32 randomness = keccak256(abi.encode(address(this), block.chainid, epoch, word));
+        rounds[epoch].randomness = randomness;
+        emit DrawFinalized(epoch, randomness);
+    }
+
     function commitSeed(uint256 epoch, bytes32 seedHash) external {
+        if (block.chainid != 31337 || address(randomnessSource) != address(0)) revert LocalFixtureOnly();
         if (msg.sender != poster) revert NotPoster();
         if (epoch <= currentEpoch()) revert BadEpoch(); // must be committed before epoch starts
         Round storage r = rounds[epoch];
+        if (seedHash == bytes32(0)) revert BadSeed();
         if (r.seedHash != bytes32(0)) revert AlreadySet();
         r.seedHash = seedHash;
         emit SeedCommitted(epoch, seedHash);
@@ -121,6 +167,7 @@ contract GameReserve is TimelockedRoles {
 
     /// @notice Permissionless: fixes the entropy block once the epoch has ended.
     function anchor(uint256 epoch) external {
+        if (block.chainid != 31337 || address(randomnessSource) != address(0)) revert LocalFixtureOnly();
         Round storage r = rounds[epoch];
         if (epoch >= currentEpoch() || r.seedHash == bytes32(0)) revert NotReady();
         if (r.anchorBlock != 0) revert AlreadySet();
@@ -129,6 +176,7 @@ contract GameReserve is TimelockedRoles {
     }
 
     function revealSeed(uint256 epoch, bytes32 seed) external {
+        if (block.chainid != 31337 || address(randomnessSource) != address(0)) revert LocalFixtureOnly();
         if (msg.sender != poster) revert NotPoster();
         Round storage r = rounds[epoch];
         if (r.anchorBlock == 0 || block.number <= r.anchorBlock + 1) revert NotReady();
@@ -145,7 +193,12 @@ contract GameReserve is TimelockedRoles {
         if (epoch >= currentEpoch() || epoch <= lastPostedEpoch) revert BadEpoch();
         Round storage r = rounds[epoch];
         if (r.randomness == bytes32(0)) revert NotReady();
-        if (total > epochCap()) revert OverCap();
+        if (root == bytes32(0) || total == 0) revert NotReady();
+        uint256 day = currentEpoch();
+        if (postingDayCap[day] == 0) postingDayCap[day] = epochCap();
+        // Backlogged epochs may not be used to burst many days' emissions in one day.
+        if (total > epochCap() || postedInDay[day] + total > postingDayCap[day]) revert OverCap();
+        postedInDay[day] += total;
         r.root = root;
         r.total = uint128(total);
         r.postedAt = uint64(block.timestamp);

@@ -2,16 +2,11 @@
 // and dominant strategies, and checks the anti-convergence steering actually helps.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFileSync, mkdirSync } from 'node:fs';
 import { runSimulation } from '../server/src/sim/simulate.js';
 
 test('120 players × 4 days: no convergence', () => {
   const r = runSimulation({ players: 120, days: 4 });
   const off = runSimulation({ players: 120, days: 4, steering: false });
-  if (process.env.DCP_WRITE_EVIDENCE) {
-    mkdirSync('docs/evidence', { recursive: true });
-    writeFileSync('docs/evidence/variety-simulation.json', JSON.stringify({ steeringOn: r, steeringOff: off }, null, 2) + '\n');
-  }
   assert.ok(r.actions > 100_000, 'substantial play volume');
   assert.ok(r.errors / r.actions < 0.01, `illegal action rate ${r.errors}/${r.actions}`);
   assert.ok(r.meanPairwiseJaccard < 0.05, `players share few upgrades (jaccard ${r.meanPairwiseJaccard})`);

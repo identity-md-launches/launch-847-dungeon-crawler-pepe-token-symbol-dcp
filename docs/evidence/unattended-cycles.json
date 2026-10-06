@@ -1,0 +1,69 @@
+{
+  "label": "LOCAL TEST FIXTURE; no paid work",
+  "cycles": [
+    {
+      "id": "c1-mux6apwz",
+      "stage": "done",
+      "status": "done",
+      "attempts": 1
+    },
+    {
+      "id": "c8-mv76dop3",
+      "stage": "done",
+      "status": "done",
+      "attempts": 1
+    }
+  ],
+  "versions": [
+    {
+      "version": 1,
+      "status": "published",
+      "packs": "[]"
+    },
+    {
+      "version": 2,
+      "status": "published",
+      "packs": "[\"pack-c1-mux6apwz\"]"
+    },
+    {
+      "version": 3,
+      "status": "published",
+      "packs": "[\"pack-c1-mux6apwz\",\"pack-c8-mv76dop3\"]"
+    }
+  ],
+  "payments": 0,
+  "rulesVersion": 1,
+  "keeper": {
+    "at": 1791925841991,
+    "results": [
+      {
+        "name": "chain-refresh",
+        "ok": true
+      },
+      {
+        "name": "indexer",
+        "ok": true
+      },
+      {
+        "name": "epochs",
+        "ok": true
+      },
+      {
+        "name": "harvest",
+        "ok": true
+      },
+      {
+        "name": "content",
+        "ok": true
+      },
+      {
+        "name": "backup",
+        "ok": true
+      },
+      {
+        "name": "housekeeping",
+        "ok": true
+      }
+    ]
+  }
+}

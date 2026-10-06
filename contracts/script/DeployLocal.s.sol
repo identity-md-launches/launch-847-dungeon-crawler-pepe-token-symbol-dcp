@@ -9,28 +9,46 @@ import {GameShop} from "../src/GameShop.sol";
 import {MockERC20, MockIMDFactory} from "../test/mocks/Mocks.sol";
 
 /// LOCAL / ANVIL ONLY. Deploys the full stack against labelled mock IMD, WETH and factory.
-/// Refuses to run on chain id 1. Mainnet deployment is out of scope for this build; see
+/// Refuses every chain except local 31337. Contains NO broadcast or wallet access. See
 /// docs/launch-plan.md for the reviewed sequence.
-///   anvil &
-///   forge script contracts/script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast \
-///     --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+///   forge script contracts/script/DeployLocal.s.sol
 contract DeployLocal is Script {
+    struct Config {
+        address council;
+        address guardian;
+        address poster;
+        address swarm;
+    }
+
     function run() external {
-        require(block.chainid != 1, "local only");
-        address me = msg.sender;
-        vm.startBroadcast();
+        deploy(Config(address(0x1111), address(0x2222), address(0x3333), address(0x4444)));
+    }
+
+    function deploy(Config memory cfg)
+        public
+        returns (DCPToken dcp, GameReserve reserve, OpsTreasury treasury, GameShop shop)
+    {
+        require(block.chainid == 31337, "local only");
+        require(
+            cfg.council != address(0) && cfg.guardian != address(0) && cfg.poster != address(0)
+                && cfg.swarm != address(0),
+            "roles"
+        );
+        // Fixed local fixture identity; unrelated to the caller or an accessible wallet.
+        address me = address(0xD3A0);
+        vm.startPrank(me);
         MockERC20 imd = new MockERC20("IMD-TEST");
         MockERC20 weth = new MockERC20("WETH-TEST");
         MockIMDFactory factory = new MockIMDFactory(address(imd), me);
 
         address predicted = vm.computeCreateAddress(me, vm.getNonce(me) + 1);
-        GameReserve reserve = new GameReserve(predicted, me, me, me, 2 days, 1 days, 10, 2_000_000 ether);
+        reserve = new GameReserve(predicted, cfg.council, cfg.guardian, cfg.poster, 2 days, 1 days, 10, 2_000_000 ether);
         address[] memory to = new address[](3);
         uint256[] memory amt = new uint256[](3);
         (to[0], amt[0]) = (me, 200_000_000 ether);
-        (to[1], amt[1]) = (me, 100_000_000 ether);
+        (to[1], amt[1]) = (cfg.swarm, 100_000_000 ether);
         (to[2], amt[2]) = (address(reserve), 700_000_000 ether);
-        DCPToken dcp = new DCPToken(to, amt);
+        dcp = new DCPToken(to, amt);
         require(address(dcp) == predicted, "prediction");
 
         dcp.approve(address(factory), 200_000_000 ether);
@@ -53,17 +71,17 @@ contract DeployLocal is Script {
             gasLow: 0.02 ether,
             gasPerEpoch: 0.2 ether
         });
-        OpsTreasury treasury = new OpsTreasury(
-            [address(dcp), address(imd), address(weth), address(reserve), address(factory), me],
-            me,
+        treasury = new OpsTreasury(
+            [address(dcp), address(imd), address(weth), address(reserve), address(factory), cfg.council],
+            cfg.guardian,
             id,
             2 days,
             [uint256(2_000 ether), 1_000, 20 ether],
             p
         );
         factory.setRequester(id, address(treasury));
-        GameShop shop = new GameShop(address(dcp), address(reserve), address(treasury), 3_000, 5_000);
-        vm.stopBroadcast();
+        shop = new GameShop(address(dcp), address(reserve), address(treasury), 3_000, 5_000);
+        vm.stopPrank();
 
         console2.log("DCP", address(dcp));
         console2.log("GameReserve", address(reserve));

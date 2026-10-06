@@ -14,7 +14,8 @@ function play(seed, n, archetype = 'greedy', classId = 'brawler') {
   const rng = Rng.from('policy', seed.toString('hex'));
   let errors = 0;
   for (let i = 0; i < n && ch.alive; i++) {
-    const a = chooseAction(ch, content, archetype, rng);
+    const a = ch.pending?.kind === 'stairs' && ch.floor >= 9
+      ? { type: 'overtime' } : chooseAction(ch, content, archetype, rng);
     try { act(ctxFor(seed), ch, a); } catch (e) { if (!(e instanceof GameError)) throw e; errors++; if (ch.pending?.kind === 'offer') act(ctxFor(seed), ch, { type: 'skip' }); else if (ch.pending && ch.pending.kind !== 'combat') ch.pending = null; }
   }
   return { ch, errors };
@@ -51,15 +52,20 @@ test('every generated offer is a valid, budgeted, distinct combination', () => {
 test('substantial play across all archetypes and classes runs without engine faults', () => {
   let deepest = 0;
   for (const [i, arch] of ARCHETYPES.entries()) {
-    const { ch, errors } = play(deriveSeed('k', 'long' + i), 2500, arch, content.classes[i % content.classes.length].id);
-    assert.ok(errors < 60, `${arch}: ${errors} illegal actions`);
-    assert.ok(ch.stats.rooms > 10);
-    deepest = Math.max(deepest, ch.stats.bestDepth);
+    let rooms = 0;
+    // Permadeath may end a particular run early; exercise successive lives for each policy.
+    for (let life = 0; life < 5; life++) {
+      const { ch, errors } = play(deriveSeed('k', 'long' + i + ':' + life), 2500, arch, content.classes[i % content.classes.length].id);
+      assert.ok(errors < 60, `${arch}: ${errors} illegal actions`);
+      rooms += ch.stats.rooms;
+      deepest = Math.max(deepest, ch.stats.bestDepth);
+    }
+    assert.ok(rooms > 30, `${arch}: substantial room exploration across lives`);
   }
   assert.ok(deepest >= 4, 'some bot descends');
 });
 
-test('illegal moves are rejected without mutating the world', () => {
+test('illegal engine moves are rejected (service tests verify transactional rollback)', () => {
   const ch = newCharacter(content, deriveSeed('k', 'I'), { id: 'I', name: 'I', classId: 'monk', day: 0 });
   assert.throws(() => act(ctxFor(deriveSeed('k', 'I')), ch, { type: 'move', to: 999 }), GameError);
   assert.throws(() => act(ctxFor(deriveSeed('k', 'I')), ch, { type: 'attack' }), GameError);

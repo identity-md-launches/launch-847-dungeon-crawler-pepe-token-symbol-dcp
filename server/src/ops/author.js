@@ -28,7 +28,7 @@ const KINDS = [
 ];
 const PLACES = ['Timeshare Presentation of the Damned', 'Haunted Carwash', 'Infinite Airport Layover', 'Water Park of Lost Bandaids', 'Bureau of Unclaimed Limbs', 'Strip-Mall Necropolis', 'Endless Baby Shower', 'Quarterly Review Dimension'];
 const EVENTS = [
-  ['Mandatory Fun Day', 'Taunting heals 1 HP. HR is watching.', { hypeMult: 1.5 }],
+  ['Mandatory Fun Day', 'Hype gains +50%. HR is watching.', { hypeMult: 1.5 }],
   ['Inflation Spike', 'Gold drops +25%, the IDSC has printed money again.', { goldMult: 1.25 }],
   ['Elite Job Fair', 'Elites everywhere, networking aggressively.', { eliteMult: 2.5 }],
   ['Quiet Quitting', 'Monsters have 15% less HP. They just don\'t care.', { enemyHp: 0.85 }],

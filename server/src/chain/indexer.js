@@ -1,9 +1,9 @@
 // Confirmation-depth indexer. Only logs at or below (head - confirmations) are applied, each
 // exactly once (orders/rewards are keyed by id), so retries and restarts are idempotent.
 // A reorg is detected by comparing the stored hash of the cursor block with the chain's; the
-// cursor then walks back to the last matching block and re-scans. Unconfirmed purchases are
+// indexer halts settlement on a deep reorg for reconciliation. Unconfirmed purchases are
 // surfaced as "pending" for the UI but never credited.
-import { tx, one, run, all } from '../db.js';
+import { tx, one, run, all, getMeta, setMeta } from '../db.js';
 
 export class Indexer {
   constructor({ db, chain, confirmations = 12, onPurchase, onClaim, log = () => {} }) {
@@ -15,6 +15,7 @@ export class Indexer {
   }
 
   async poll() {
+    if (getMeta(this.db, 'chainHalted')) throw new Error('DeepReorg: indexer halted pending canonical reconciliation');
     const head = await this.chain.getBlockNumber();
     const safe = head - this.confirmations;
     let cur = this.cursor();
@@ -22,12 +23,10 @@ export class Indexer {
     if (cur.block_number >= 0) {
       const b = await this.chain.getBlock(cur.block_number);
       if (!b || b.hash !== cur.block_hash) {
-        const back = await this.findCommonAncestor(cur.block_number);
-        this.log(`reorg detected at ${cur.block_number}; rewinding to ${back.number}`);
-        run(this.db, "INSERT INTO outages(component, started_at, ended_at, note) VALUES('indexer', ?, ?, ?)", Date.now(), Date.now(), `deep reorg past confirmation depth at block ${cur.block_number}`);
-        run(this.db, "UPDATE chain_cursor SET block_number = ?, block_hash = ? WHERE name = 'main'", back.number, back.hash);
-        run(this.db, 'DELETE FROM seen_blocks WHERE number > ?', back.number);
-        cur = { block_number: back.number, block_hash: back.hash };
+        // Consumed items cannot be safely undone by rewinding a cursor alone.
+        // Keep ownership evidence and stop settlement for explicit reconciliation.
+        setMeta(this.db, 'chainHalted', { block: cur.block_number, at: Date.now() });
+        throw new Error('DeepReorg: settlement halted; preserve purchases and claim proofs');
       }
     }
     if (safe > cur.block_number) {

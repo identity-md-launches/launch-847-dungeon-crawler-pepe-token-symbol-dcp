@@ -8,7 +8,7 @@ import { liabilities } from '../economy.js';
 export function statusReport({ db, chain, game, budgetCfg, appVersion }) {
   const spend = all(db, "SELECT kind, asset, sum(CAST(amount AS REAL)) / 1e18 total, count(*) n FROM ledger WHERE ts > ? GROUP BY kind, asset", Date.now() - 7 * 86400_000);
   const epochs = all(db, 'SELECT epoch, status, total, root, randomness FROM epochs ORDER BY epoch DESC LIMIT 7');
-  const payments = all(db, 'SELECT invoice_id, status, amount, attempts, error FROM payments ORDER BY created_at DESC LIMIT 10');
+  const payments = all(db, 'SELECT invoice_id, status, amount, attempts FROM payments ORDER BY created_at DESC LIMIT 10');
   const rules = ensureRules(db);
   return {
     app: { version: appVersion, chain: chain.kind, chainId: chain.chainId, labelled: chain.kind === 'sim' ? 'LOCAL SIMULATION — test fixtures, no real assets' : null },
@@ -23,8 +23,9 @@ export function statusReport({ db, chain, game, budgetCfg, appVersion }) {
     spend7d: spend,
     payments,
     epochs,
-    keeper: getMeta(db, 'lastTick'),
-    outages: recentOutages(db),
+    keeper: (() => { const tick = getMeta(db, 'lastTick'); return tick && { at: tick.at, results: tick.results.map(({ name, ok }) => ({ name, ok })) }; })(),
+    settlementHalted: !!getMeta(db, 'chainHalted'),
+    outages: recentOutages(db).map(({ component, started_at, ended_at }) => ({ component, started_at, ended_at, note: 'See private operator diagnostics' })),
     disclaimers: [
       'No yield, returns or perpetual service are promised. Prizes are small, capped, and may stop.',
       'Player claims are paid by GameReserve directly and do not depend on the operator staying online.',

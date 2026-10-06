@@ -5,7 +5,7 @@
 //   whose randomness comes from GameReserve's commit-reveal (not from the server alone).
 // - Anti-farming: rewards need a linked wallet, account age, real play, and are capped per
 //   account per epoch. Accounts sharing a device/network signal split ONE account's cap, so
-//   spinning up more wallets earns nothing extra.
+//   this is a heuristic cap, not proof of one human or complete Sybil resistance.
 // - Budget: never more than min(onchain epochCap, configured prize budget). Milestones are
 //   paid first; overflow stays pending for later epochs rather than being dropped.
 // Player liabilities live only in `rewards` rows and the reserve's `outstanding`; nothing in
@@ -88,7 +88,8 @@ export function computeEpoch(db, cfg, { epoch, day, randomness, budget, now = Da
     const c = cluster.get(accountId);
     const used = clusterSpent.get(c) ?? 0n;
     const room = cfg.perAccountEpochCap - used;
-    if (room <= 0n || spent + amount > budget) return false;
+    // Never discard the unpaid remainder of an earned milestone.
+    if (room <= 0n || spent + amount > budget || (kind === 'milestone' && amount > room)) return false;
     const amt = amount <= room ? amount : room;
     clusterSpent.set(c, used + amt);
     spent += amt;
@@ -132,21 +133,30 @@ export async function advanceEpochs(db, chain, cfg, { currentEpoch, dayOf, now =
     if (one(db, 'SELECT 1 FROM epochs WHERE epoch = ?', e)) continue;
     const seed = hex(randomBytes(32));
     const seedHash = hex(keccak256(unhex(seed)));
-    await chain.commitSeed(e, seedHash, currentEpoch);
-    run(db, 'INSERT INTO epochs(epoch, seed, seed_hash, status, updated_at) VALUES(?, ?, ?, ?, ?)', e, seed, seedHash, 'committed', now);
-    log(`epoch ${e}: seed committed`);
+    // Durable intent BEFORE contacting the chain: a lost response must not lose the seed.
+    run(db, 'INSERT INTO epochs(epoch, seed, seed_hash, status, updated_at) VALUES(?, ?, ?, ?, ?)', e, seed, seedHash, 'prepared', now);
+  }
+  for (const ep of all(db, "SELECT * FROM epochs WHERE status = 'prepared' ORDER BY epoch")) {
+    const r = await chain.roundState(ep.epoch);
+    if (!r.seedHash) {
+      if (ep.epoch <= currentEpoch) { run(db, "UPDATE epochs SET status = 'expired' WHERE epoch = ?", ep.epoch); continue; }
+      await chain.commitSeed(ep.epoch, ep.seed_hash, currentEpoch);
+    } else if (r.seedHash !== ep.seed_hash) throw new Error('Committed seed mismatch');
+    run(db, "UPDATE epochs SET status = 'committed', updated_at = ? WHERE epoch = ?", now, ep.epoch);
   }
   const open = all(db, "SELECT * FROM epochs WHERE epoch < ? AND status NOT IN ('final','expired') ORDER BY epoch", currentEpoch);
   for (const ep of open) {
     try {
       if (ep.status === 'committed') {
-        const ab = await chain.anchor(ep.epoch);
+        const state = await chain.roundState(ep.epoch);
+        const ab = state.anchorBlock || await chain.anchor(ep.epoch);
         run(db, "UPDATE epochs SET status = 'anchored', anchor_block = ?, updated_at = ? WHERE epoch = ?", ab, now, ep.epoch);
         ep.status = 'anchored';
       }
       if (ep.status === 'anchored') {
         try {
-          const rnd = await chain.revealSeed(ep.epoch, ep.seed);
+          const state = await chain.roundState(ep.epoch);
+          const rnd = state.randomness || await chain.revealSeed(ep.epoch, ep.seed);
           run(db, "UPDATE epochs SET status = 'revealed', randomness = ?, updated_at = ? WHERE epoch = ?", rnd, now, ep.epoch);
           ep.status = 'revealed'; ep.randomness = rnd;
         } catch (e) {
@@ -169,12 +179,17 @@ export async function advanceEpochs(db, chain, cfg, { currentEpoch, dayOf, now =
         log(`epoch ${ep.epoch}: ${leaves.length} leaves, total ${total / E18} DCP`);
       }
       if (ep.status === 'drawn') {
-        if (BigInt(ep.total) > 0n) await chain.postRoot(ep.epoch, ep.root, BigInt(ep.total));
+        const state = await chain.roundState(ep.epoch);
+        if (state.root && (state.root !== ep.root || state.total !== BigInt(ep.total))) throw new Error('Posted root mismatch');
+        if (BigInt(ep.total) > 0n && !state.root) await chain.postRoot(ep.epoch, ep.root, BigInt(ep.total));
         run(db, "UPDATE epochs SET status = 'posted', updated_at = ? WHERE epoch = ?", now, ep.epoch);
         ep.status = 'posted';
         ep.updated_at = now;
       }
       if (ep.status === 'posted' && now - ep.updated_at >= cfg.challengeMs) {
+        const state = await chain.roundState(ep.epoch);
+        if (state.vetoed) { run(db, "UPDATE epochs SET status = 'vetoed' WHERE epoch = ?", ep.epoch); continue; }
+        if (BigInt(ep.total) > 0n && (!state.root || now / 1000 < state.postedAt + cfg.challengeMs / 1000)) continue;
         run(db, "UPDATE rewards SET status = 'claimable' WHERE epoch = ? AND status = 'rooted'", ep.epoch);
         run(db, "UPDATE epochs SET status = 'final', updated_at = ? WHERE epoch = ?", now, ep.epoch);
       }

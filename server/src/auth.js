@@ -76,7 +76,10 @@ export function verifySignIn(db, cfg, { message, signature, currentAccountId }) 
   if (p.chainId !== cfg.chainId) throw new Error(`wrong network: expected chain ${cfg.chainId}`);
   if (p.version !== '1') throw new Error('bad version');
   const exp = Date.parse(p.expirationTime);
-  if (!Number.isFinite(exp) || exp < Date.now() || exp - Date.parse(p.issuedAt) > NONCE_MS) throw new Error('expired message');
+  const issued = Date.parse(p.issuedAt);
+  if (!Number.isFinite(exp) || !Number.isFinite(issued) || issued > Date.now() + 30_000 ||
+      issued > exp || exp < Date.now() || exp - issued > NONCE_MS) throw new Error('expired message');
+  if (message !== siweMessage(p)) throw new Error('noncanonical message');
   const signer = recoverPersonal(message, signature);
   if (!signer || signer !== toChecksum(p.address)) throw new Error('signature does not match address');
   return tx(db, () => {

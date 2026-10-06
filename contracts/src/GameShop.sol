@@ -17,7 +17,8 @@ contract GameShop {
     uint256 public immutable BURN_BPS;
     uint256 public immutable RESERVE_BPS;
 
-    mapping(bytes32 => bool) public orderUsed;
+    // A different payer cannot consume another wallet's pending order by front-running it.
+    mapping(address => mapping(bytes32 => bool)) public orderUsed;
 
     event Purchase(address indexed buyer, bytes32 indexed orderId, uint256 sku, uint256 amount);
 
@@ -26,6 +27,7 @@ contract GameShop {
     error TransferFailed();
 
     constructor(address dcp_, address reserve_, address treasury_, uint256 burnBps, uint256 reserveBps) {
+        require(dcp_ != address(0) && reserve_ != address(0) && treasury_ != address(0), "zero address");
         require(burnBps + reserveBps <= 10_000, "split");
         dcp = IERC20Min(dcp_);
         reserve = reserve_;
@@ -37,8 +39,8 @@ contract GameShop {
     /// @param orderId server-issued order id (hash of account, sku, nonce); one payment per order.
     function purchase(bytes32 orderId, uint256 sku, uint256 amount) external {
         if (amount == 0) revert ZeroAmount();
-        if (orderUsed[orderId]) revert DuplicateOrder();
-        orderUsed[orderId] = true;
+        if (orderUsed[msg.sender][orderId]) revert DuplicateOrder();
+        orderUsed[msg.sender][orderId] = true;
         if (!dcp.transferFrom(msg.sender, address(this), amount)) revert TransferFailed();
         uint256 toBurn = (amount * BURN_BPS) / 10_000;
         uint256 toReserve = (amount * RESERVE_BPS) / 10_000;

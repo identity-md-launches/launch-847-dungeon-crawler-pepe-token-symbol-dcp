@@ -1,0 +1,184 @@
+{
+  "steeringOn": {
+    "config": {
+      "players": 120,
+      "days": 4,
+      "steering": true,
+      "contentVersion": 1,
+      "packs": [
+        "base"
+      ]
+    },
+    "actions": 198938,
+    "errors": 340,
+    "deaths": 502,
+    "distinctPowerSignatures": 11636,
+    "meanPowersPerAccount": 142.07,
+    "sharedSignatureRate": 0.5015,
+    "meanPairwiseJaccard": 0.0046,
+    "offerRepeatRate": 0.0078,
+    "dominantTagEntropyBits": 3.657,
+    "dominantTagMaxBits": 3.907,
+    "dominantTags": {
+      "curse": 8,
+      "poison": 3,
+      "crit": 5,
+      "frost": 7,
+      "filth": 12,
+      "minion": 4,
+      "fire": 7,
+      "bureaucracy": 21,
+      "chaos": 14,
+      "hype": 5,
+      "bleed": 11,
+      "shield": 8,
+      "speed": 9,
+      "gold": 1,
+      "void": 5
+    },
+    "distinctSynergyCombos": 110,
+    "maxEffectPickShare": 0.0405,
+    "layoutDuplicateRate": 0.0334,
+    "topBracketMaxArchetypeShare": 0.333,
+    "archetypes": {
+      "greedy": {
+        "n": 15,
+        "fame": 4504,
+        "depth": 8.8,
+        "deaths": 5.93
+      },
+      "cautious": {
+        "n": 15,
+        "fame": 5608,
+        "depth": 9,
+        "deaths": 3.13
+      },
+      "chaotic": {
+        "n": 15,
+        "fame": 6436,
+        "depth": 8.87,
+        "deaths": 2.67
+      },
+      "sellout": {
+        "n": 15,
+        "fame": 4623,
+        "depth": 9,
+        "deaths": 4.53
+      },
+      "quester": {
+        "n": 15,
+        "fame": 5817,
+        "depth": 8.87,
+        "deaths": 2.87
+      },
+      "synergist": {
+        "n": 15,
+        "fame": 5709,
+        "depth": 8.93,
+        "deaths": 4.13
+      },
+      "speedrunner": {
+        "n": 15,
+        "fame": 4079,
+        "depth": 8.6,
+        "deaths": 6.07
+      },
+      "hoarder": {
+        "n": 15,
+        "fame": 4206,
+        "depth": 9,
+        "deaths": 4.13
+      }
+    }
+  },
+  "steeringOff": {
+    "config": {
+      "players": 120,
+      "days": 4,
+      "steering": false,
+      "contentVersion": 1,
+      "packs": [
+        "base"
+      ]
+    },
+    "actions": 198937,
+    "errors": 176,
+    "deaths": 491,
+    "distinctPowerSignatures": 11653,
+    "meanPowersPerAccount": 143.01,
+    "sharedSignatureRate": 0.5061,
+    "meanPairwiseJaccard": 0.0046,
+    "offerRepeatRate": 0.0073,
+    "dominantTagEntropyBits": 3.357,
+    "dominantTagMaxBits": 3.907,
+    "dominantTags": {
+      "shield": 11,
+      "chaos": 16,
+      "crit": 6,
+      "bureaucracy": 18,
+      "filth": 14,
+      "bleed": 8,
+      "frost": 5,
+      "hype": 2,
+      "curse": 13,
+      "void": 19,
+      "fire": 5,
+      "minion": 2,
+      "poison": 1
+    },
+    "distinctSynergyCombos": 100,
+    "maxEffectPickShare": 0.0581,
+    "layoutDuplicateRate": 0.0405,
+    "topBracketMaxArchetypeShare": 0.25,
+    "archetypes": {
+      "greedy": {
+        "n": 15,
+        "fame": 5436,
+        "depth": 8.67,
+        "deaths": 4.47
+      },
+      "cautious": {
+        "n": 15,
+        "fame": 5303,
+        "depth": 9,
+        "deaths": 3.2
+      },
+      "chaotic": {
+        "n": 15,
+        "fame": 6668,
+        "depth": 9,
+        "deaths": 2.2
+      },
+      "sellout": {
+        "n": 15,
+        "fame": 5385,
+        "depth": 9,
+        "deaths": 4
+      },
+      "quester": {
+        "n": 15,
+        "fame": 5282,
+        "depth": 8.87,
+        "deaths": 4.73
+      },
+      "synergist": {
+        "n": 15,
+        "fame": 5847,
+        "depth": 9,
+        "deaths": 4
+      },
+      "speedrunner": {
+        "n": 15,
+        "fame": 3902,
+        "depth": 8.8,
+        "deaths": 6.73
+      },
+      "hoarder": {
+        "n": 15,
+        "fame": 4703,
+        "depth": 9,
+        "deaths": 3.4
+      }
+    }
+  }
+}

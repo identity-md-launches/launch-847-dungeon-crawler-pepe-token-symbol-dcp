@@ -123,6 +123,11 @@ export class RpcChain {
     return wordToBytes32(words[2]);
   }
   async postRoot(e, root, total) { await this.send(this.keeper, this.addr.reserve, calldata('postRoot(uint256,bytes32,uint256)', ['uint256', 'bytes32', 'uint256'], [e, root, total])); }
+  async roundState(e) {
+    const w = decodeWords(await this.call(this.addr.reserve, calldata('rounds(uint256)', ['uint256'], [e])));
+    const hash = (i) => w[i] === 0n ? null : wordToBytes32(w[i]);
+    return { seedHash: hash(0), anchorBlock: Number(w[1]), randomness: hash(2), root: hash(3), total: w[4], claimed: w[5], postedAt: Number(w[6]), vetoed: w[7] !== 0n };
+  }
 
   // OpsTreasury
   async harvest() {
@@ -140,4 +145,3 @@ export class RpcChain {
     return (await this.word(this.addr.treasury, 'invoicePaid(bytes32)', ['bytes32'], [id])) !== 0n;
   }
 }
-

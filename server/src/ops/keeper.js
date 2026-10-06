@@ -29,11 +29,17 @@ export class Keeper {
   }
 
   async tick(now = this.game.now()) {
+    if (this.running) return [{ name: 'keeper', ok: false, error: 'tick already in progress' }];
+    this.running = true;
+    try { return await this.runTick(now); } finally { this.running = false; }
+  }
+
+  async runTick(now) {
     const results = [];
     results.push(await this.task('chain-refresh', () => this.chain.refresh()));
     results.push(await this.task('indexer', () => this.indexer.poll()));
     const epoch = this.epochAt(now);
-    results.push(await this.task('epochs', () => advanceEpochs(this.db, this.chain, this.econCfg, { currentEpoch: epoch, dayOf: (e) => e - 1, now, log: this.log })));
+    if (!getMeta(this.db, 'chainHalted')) results.push(await this.task('epochs', () => advanceEpochs(this.db, this.chain, this.econCfg, { currentEpoch: epoch, dayOf: (e) => e - 1, now, log: this.log })));
     results.push(await this.task('harvest', async () => {
       const last = getMeta(this.db, 'lastHarvestEpoch', 0);
       if (last >= epoch) return;

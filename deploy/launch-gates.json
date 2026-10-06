@@ -1,0 +1,33 @@
+{
+  "mode": "build-and-review",
+  "launchAuthorized": false,
+  "productionEnabled": false,
+  "chainIdTarget": 1,
+  "name": "Dungeon Crawler Pepe",
+  "symbol": "DCP",
+  "allocation": { "poolBps": 2000, "swarmBps": 1000, "reserveBps": 7000 },
+  "preferredPair": "imd",
+  "fallbackPair": "eth",
+  "requesterPairLiquidity": "0",
+  "addresses": null,
+  "publicRepositoryUrl": null,
+  "servicesFunded": false,
+  "externalIndependentReview": null,
+  "bootstrap": {
+    "cashCommittedUSD": 0,
+    "IMDCommitted": "0",
+    "ETHCommitted": "0",
+    "observedWorkPriceIMD": "0.5",
+    "illustrativeRuns": 60,
+    "illustrativeWorkTotalIMD": "30",
+    "gasBudgetETH": "0.5",
+    "hostingQuoteUSD": null,
+    "backupQuoteUSD": null,
+    "RPCQuoteUSD": null,
+    "VRFSubscriptionQuoteETH": null,
+    "operatorQuoteUSD": null,
+    "note": "Gas reserve is a proposed budget, not an estimated bill. All cash/ETH/IMD must be explicitly supplied later. DCP seed is not cash."
+  },
+  "requiredOperators": ["IMD launch deployer", "IMD public source publisher", "independent adversarial reviewer", "2-of-3 operator council", "separate guardian", "backend/database operator", "keeper operator", "isolated payment operator", "content author and independent content reviewer"],
+  "blockingIntegrations": ["verified factory ABI and requester routing", "reserve/remainder deployment sequencing", "real pool LP ownership and depth", "bounded liquid swap route and stale-resistant price adapter", "Permit2/x402 constrained payment signer", "VRF funding, verified coordinator and backend snapshot reconciliation", "durable signed transaction journal", "host and backup failover provisioning", "independent security review", "public GitHub publication"]
+}

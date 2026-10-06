@@ -23,6 +23,10 @@ CREATE TABLE IF NOT EXISTS action_log (
   account_id TEXT NOT NULL, action_id TEXT NOT NULL, char_id TEXT NOT NULL, rev_after INTEGER NOT NULL,
   response TEXT NOT NULL, created_at INTEGER NOT NULL, PRIMARY KEY (account_id, action_id)
 );
+CREATE TABLE IF NOT EXISTS action_requests (
+  account_id TEXT NOT NULL, action_id TEXT NOT NULL, request TEXT NOT NULL,
+  PRIMARY KEY (account_id, action_id)
+);
 CREATE TABLE IF NOT EXISTS daily_fame (day INTEGER NOT NULL, account_id TEXT NOT NULL, fame INTEGER NOT NULL, PRIMARY KEY (day, account_id));
 CREATE TABLE IF NOT EXISTS picks (effect_id TEXT PRIMARY KEY, n INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS cosmetics (account_id TEXT NOT NULL, sku INTEGER NOT NULL, order_id TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL);
@@ -66,7 +70,7 @@ CREATE TABLE IF NOT EXISTS signals (account_id TEXT NOT NULL, signal TEXT NOT NU
 export function openDb(path) {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
-  db.exec('PRAGMA journal_mode = WAL; PRAGMA synchronous = NORMAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
+  db.exec('PRAGMA journal_mode = WAL; PRAGMA synchronous = FULL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
   db.exec(SCHEMA);
   return db;
 }

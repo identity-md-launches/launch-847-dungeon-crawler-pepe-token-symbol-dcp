@@ -1,0 +1,30 @@
+{
+  "mode": "local-simulation",
+  "api": "/api",
+  "files": {
+    "index.html": {
+      "bytes": 5892,
+      "sha256": "e08be3dd54bdc9a311f29c1ac04826a6978d7ca221b211b01f55b871ddd84085"
+    },
+    "app.js": {
+      "bytes": 25165,
+      "sha256": "b1854fb637e6ec26ff4f9957490924d3dec9e542cd57ffa92357f0e4ce3716a2"
+    },
+    "wallet.js": {
+      "bytes": 2641,
+      "sha256": "f89f3416a7bba87aa01f3c2795d707c7ecbf9f44d2112711da77c14695f1395c"
+    },
+    "style.css": {
+      "bytes": 5478,
+      "sha256": "21b5d6cae8a61391a432e552db56e38e0742b5932d54c528e740e68f0d6f7e6d"
+    },
+    "favicon.svg": {
+      "bytes": 524,
+      "sha256": "d6934d96872a54bb51828e810fa481392986d54ec7cf8d52a5619088f11a83cd"
+    },
+    "manifest.webmanifest": {
+      "bytes": 235,
+      "sha256": "d011a2107ca91b305c0e577697462f71abccb31d005f57e43a7d59ffa539bc6b"
+    }
+  }
+}

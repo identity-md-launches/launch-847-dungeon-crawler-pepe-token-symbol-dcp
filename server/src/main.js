@@ -13,6 +13,7 @@ import { processQueuedPayments } from './ops/pipeline.js';
 const env = process.env;
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const demo = env.DCP_DEMO === '1';
+if (!demo) throw new Error('This release is BUILD-AND-REVIEW only. Run DCP_DEMO=1; production is disabled.');
 const role = env.DCP_ROLE ?? 'all';
 const port = Number(env.PORT ?? 8787);
 const log = (m) => console.log(`[${new Date().toISOString()}] ${m}`);

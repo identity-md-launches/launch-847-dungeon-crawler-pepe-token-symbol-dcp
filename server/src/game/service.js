@@ -11,8 +11,9 @@ import { recordDepth } from '../economy.js';
 import { ownedSkus, consumeRevive } from '../shop.js';
 
 export class ContentRegistry {
-  constructor(db) {
+  constructor(db, now = () => Date.now()) {
     this.db = db;
+    this.now = now;
     this.cache = new Map();
     if (!one(db, 'SELECT 1 FROM content_versions WHERE version = 1')) {
       run(db, 'INSERT INTO content_versions(version, packs, status, activate_at, created_at, note) VALUES(1, ?, ?, 0, ?, ?)', '[]', 'published', Date.now(), 'base pack');
@@ -28,10 +29,10 @@ export class ContentRegistry {
     this.cache.set(version, c);
     return c;
   }
-  activeVersion(now = Date.now()) {
+  activeVersion(now = this.now()) {
     return one(this.db, "SELECT max(version) v FROM content_versions WHERE status = 'published' AND activate_at <= ?", now).v ?? 1;
   }
-  active(now = Date.now()) { return this.get(this.activeVersion(now)); }
+  active(now = this.now()) { return this.get(this.activeVersion(now)); }
   status(version) { return one(this.db, 'SELECT status FROM content_versions WHERE version = ?', version)?.status ?? 'missing'; }
 }
 
@@ -43,7 +44,7 @@ export class GameService {
     this.secret = secret;
     this.dayMs = dayMs;
     this.now = now;
-    this.registry = new ContentRegistry(db);
+    this.registry = new ContentRegistry(db, now);
     if (!getMeta(db, 'season')) setMeta(db, 'season', { id: 1, startMs: now() - (now() % dayMs) });
     this.popCache = { at: 0, map: new Map() };
   }
@@ -98,8 +99,12 @@ export class GameService {
   act(accountId, { charId, rev, actionId, action }) {
     if (typeof actionId !== 'string' || actionId.length < 8 || actionId.length > 64) throw new GameError('actionId required');
     return tx(this.db, () => {
+      const request = JSON.stringify({ charId, rev, action });
+      const oldRequest = one(this.db, 'SELECT request FROM action_requests WHERE account_id = ? AND action_id = ?', accountId, actionId);
+      if (oldRequest && oldRequest.request !== request) throw new GameError('actionId reused with different input');
       const prior = one(this.db, 'SELECT response FROM action_log WHERE account_id = ? AND action_id = ?', accountId, actionId);
       if (prior) return { ...JSON.parse(prior.response), replayed: true };
+      run(this.db, 'INSERT OR IGNORE INTO action_requests(account_id, action_id, request) VALUES(?, ?, ?)', accountId, actionId, request);
       const { row, ch } = this.load(accountId, charId);
       if (row.rev !== rev) { const e = new GameError('Stale state: another device or tab moved first.'); e.status = 409; e.current = { character: ch, rev: row.rev }; throw e; }
       const t = this.now();

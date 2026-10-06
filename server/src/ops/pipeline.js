@@ -16,8 +16,8 @@ export const PAYMENT_WAIT_MS = 6 * 3600_000; // then fall back to the free autho
 
 export function defaultBudgetConfig() {
   return {
-    paidCycleCostImd: 150n * E18, // estimated IMD per paid swarm content cycle
-    essentialDailyImd: 40n * E18, // essential ops (keeper gas top-ups, monitoring) in IMD-equivalent
+    paidCycleCostImd: E18 / 2n, // observed 2026-10-06 public API unit price; re-quote before launch
+    essentialDailyImd: 40n * E18, // conservative SIMULATION assumption, not a hosting/gas quote
     healthyDays: 60,
     lowDays: 21,
     payee: 'imd-paid-work',
@@ -73,6 +73,7 @@ export function ensureRules(db) {
 export async function payInvoice(db, chain, { invoiceId, cycleId, payee, amount }) {
   run(db, 'INSERT OR IGNORE INTO payments(invoice_id, cycle_id, payee, amount, status, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?, ?)', invoiceId, cycleId, payee, amount.toString(), 'queued', Date.now(), Date.now());
   const p = one(db, 'SELECT * FROM payments WHERE invoice_id = ?', invoiceId);
+  if (p.cycle_id !== cycleId || p.payee !== payee || p.amount !== amount.toString()) throw new Error('InvoiceConflict');
   if (p.status === 'confirmed' || p.status === 'deferred' || p.status === 'failed') return p.status;
   // External payer mode: this process holds no payment key; the isolated payer process sends it.
   if (chain.canPay === false) return 'queued';
