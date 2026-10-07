@@ -1,0 +1,45 @@
+# 2026-10-07T18:46:01Z node v24.21.0
+$ node --test test/*.test.mjs
+✔ keccak256 matches cast (3.413936ms)
+✔ address derivation and personal_sign round-trip match cast (34.272286ms)
+✔ Merkle leaf encoding matches GameReserve (shared vector with Reserve.t.sol) (3.879707ms)
+✔ ABI calldata matches cast (0.73401ms)
+✔ EIP-1559 signing matches cast (cast decode-transaction recovers the anvil signer) (3.915705ms)
+✔ same seed + same choices replays identically (retries/reloads cannot reroll) (120.211382ms)
+✔ different characters diverge: routes, offers and encounters differ (1.265023ms)
+✔ every generated offer is a valid, budgeted, distinct combination (32.569534ms)
+✔ substantial play across all archetypes and classes runs without engine faults (1024.795081ms)
+✔ illegal engine moves are rejected (service tests verify transactional rollback) (1.345732ms)
+✔ depth gate blocks descending past the daily limit; Overtime keeps play going (0.71606ms)
+✔ full power slots require an explicit replacement (0.669947ms)
+✔ death is permanent for the character and recorded (0.564119ms)
+✔ quest choices write history that later callbacks and floors react to (0.855173ms)
+✔ practice persists distinct runs and repeated actions; rejects stale edits and monetary routes (16.822957ms)
+✔ practice rolls back illegal moves and storage failures, never silently resets corrupted saves (2.025846ms)
+✔ authoritative save, retry identity, stale tab, unauthorized access and recovery (285.025474ms)
+✔ housekeeping prunes stale fingerprints, sessions and nonces without reopening old actions (374.848556ms)
+✔ wallet authentication binds nonce, domain, network, expiry, and existing guest save (43.528266ms)
+✔ purchases require finality; underpayment cannot block correct buyer; retries never duplicate inventory (7.759684ms)
+✔ revive is atomic, consumed once and removes the run from rankings (6.059661ms)
+✔ crafting consumes owned items and gold; selects power versus stats; invalid craft rolls back (5.489422ms)
+✔ restart and consistent backup retain character, inventory, balances and chain cursor (118.387144ms)
+✔ shallow reorg never credits; deep reorg halts settlement and preserves evidence (5.738123ms)
+✔ two unattended cycles persist versions, preserve old encounters, and survive rollback (507.640174ms)
+✔ invalid and injected packs cannot publish or execute; rejected work is durable (5.320678ms)
+✔ fee income funds one work invoice; conflict, retries, operator loss and caps preserve custody (8.919744ms)
+✔ milestone caps preserve pending amounts; simulated final claims survive keeper loss (11.650695ms)
+✔ guardian veto returns earned milestones to pending instead of stranding them in a void root (16.245305ms)
+✔ HTTP demo serves static frontend, API actions and safe malformed requests; launch disabled (84.074531ms)
+✔ lost commit response resumes from durable seed intent without rerolling (5.66781ms)
+✔ stress scenarios conserve funds, protect claims and stop unfunded operation (1.461492ms)
+✔ 120 players × 4 days: no convergence (20138.324077ms)
+✔ injected wallet authenticates separately and invalidates account/network changes (3.171967ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23825.080972
+exit=0

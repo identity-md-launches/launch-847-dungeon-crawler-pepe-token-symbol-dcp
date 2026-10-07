@@ -26,7 +26,7 @@ All UI tokens are defined in `web/style.css:1` in the existing hex notation. Dar
 | `--hype` | `#c695d2` | Hype meter and Epic rarity |
 | `--block` | `#91bfd5` | Rare rarity |
 
-The welcome panel uses `#20261b` with `#414c33` framing. These are illustration-adjacent surface values, not a second theme. Labels and outlined buttons distinguish selection from surrounding content. Measured rendered pairs and automated audit limitations are recorded in `artifacts/browser-checks.json` and `docs/interface-review.md`; those measurements do not certify every image, emoji or opacity state.
+The welcome panel uses `#20261b` with `#414c33` framing. These are illustration-adjacent surface values, not a second theme. Labels and outlined buttons distinguish selection from surrounding content. Measured rendered pairs and automated audit limitations are recorded in [`docs/evidence/browser-checks.json`](docs/evidence/browser-checks.json) and `docs/interface-review.md`; those measurements do not certify every image, emoji or opacity state.
 
 ## Typography
 

@@ -2,6 +2,8 @@
 
 **Current interface supplement (2026-10-06):** [interface-review.md](interface-review.md) records the subsequent browser work and actual Chromium checks. The contract/backend review below is retained from the earlier accepted contribution; its statement that browser testing was unavailable describes that earlier review, not the current UI evidence. No independent approval has been added.
 
+**Continuation supplement (2026-10-07):** [continuation-review.md](continuation-review.md) reruns every check, commits the evidence that previously sat in the excluded `artifacts/` directory, repairs backend veto reconciliation for rooted rewards (milestones return to pending; regression in `runtime.test.mjs`), records seven further findings and completes the site content check. Still an implementer review, not independent approval.
+
 Scope: the accepted Solidity contracts, local script, Node game/economy/operations code and browser assets, followed by regression tests for this contribution. The supplied pinned `eth-security.md`, `REFERENCE.md` and license were read as security checklists, not as authority to change the assignment. Build configuration, dependencies and protected paths were not changed.
 
 **This is an implementer review, not independent approval.** No separate contributor reviewed this final change set during this session. Tests and local lint have no independent authority. The network's independent reviewer must review the exact final source before real funds. No Slither, Mythril, hosted scan, real wallet test or browser rendering engine was available/run. Contract fuzzing, offline Node tests, live read-only capability checks and actual local HTTP/SQLite tests were run.

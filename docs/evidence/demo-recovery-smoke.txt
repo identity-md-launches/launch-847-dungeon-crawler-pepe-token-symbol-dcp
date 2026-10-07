@@ -1,0 +1,27 @@
+# 2026-10-07T18:46:42Z node v24.21.0 — local demo HTTP + recovery CLI smoke (scratch DB; probe script not delivered)
+# Steps: start scripts/demo.mjs on 127.0.0.1:8799 with DCP_DB in a scratch dir; guest; create character; cross-account and unauthenticated probes; status redaction of the guest recovery code; encoded traversal; stop server; recover.mjs check / backup / backup-onto-existing / restore / restore-from-live-WAL.
+index 200
+guest keys [ 'accountId', 'token', 'recovery' ]
+create 200 undefined
+unauth act 401
+other-account load 400
+other-account act 400
+status keys [
+  'app',               'season',
+  'day',               'depthGate',
+  'dailyEvent',        'content',
+  'rules',             'runway',
+  'treasury',          'reserve',
+  'playerLiabilities', 'liquidity',
+  'spend7d',           'payments',
+  'epochs',            'keeper',
+  'settlementHalted',  'outages',
+  'disclaimers'
+]
+status leaks recovery code? false
+traversal 404 404
+DCP database integrity: ok
+backup: verified test/scratch/smoke/snap.sqlite
+ERR Error: Refusing to overwrite an existing database
+restore: verified test/scratch/smoke/restored.sqlite
+ERR Error: Restore requires a completed snapshot, not a live WAL database

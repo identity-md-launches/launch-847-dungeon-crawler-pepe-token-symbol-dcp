@@ -1,0 +1,221 @@
+# 2026-10-07T18:41:39Z forge Version: 1.8.5
+# lint notes/warnings from forge build are omitted; exit codes are the commands' own
+$ forge build --offline
+No files changed, compilation skipped
+   ╭▸ contracts/src/VRFPrizeSource.sol:30:45
+30 │     bytes4 private constant EXTRA_ARGS_V1 = bytes4(keccak256("VRF ExtraArgsV1"));
+   ╭▸ contracts/src/VRFPrizeSource.sol:68:9
+68 │         emit Requested(epoch, id);
+   ╭▸ contracts/src/GameShop.sol:50:9
+50 │         emit Purchase(msg.sender, orderId, sku, amount);
+   ╭▸ contracts/src/DCPToken.sol:36:13
+36 │             sum += amounts[i];
+   ╭▸ contracts/src/DCPToken.sol:34:46
+34 │             if (recipients[i] == address(0)) revert ZeroAddress();
+    ╭▸ contracts/src/OpsTreasury.sol:174:9
+174 │         factory.claimFees(launchId);
+    ╭▸ contracts/src/OpsTreasury.sol:175:9
+175 │         factory.withdraw(launchId);
+    ╭▸ contracts/src/OpsTreasury.sol:176:9
+176 │ ┏         emit Harvested(
+177 │ ┃             dcp.balanceOf(address(this)) - d0,
+178 │ ┃             imd.balanceOf(address(this)) - i0,
+179 │ ┃             weth.balanceOf(address(this)) + address(this).balance - w0
+180 │ ┃         );
+    ╭▸ contracts/src/OpsTreasury.sol:193:14
+193 │         if (!dcp.transfer(reserve, amt)) revert TransferFailed();
+    ╭▸ contracts/src/OpsTreasury.sol:194:9
+194 │         emit Recycled(amt);
+   ╭▸ contracts/src/GameReserve.sol:86:9
+86 │         address poster_,
+    ╭▸ contracts/src/GameReserve.sol:143:9
+143 │         emit DrawRequested(epoch, snapshotHash);
+    ╭▸ contracts/src/GameReserve.sol:174:25
+174 │         r.anchorBlock = uint64(block.number);
+    ╭▸ contracts/src/OpsTreasury.sol:215:14
+215 │         if (!IERC20Min(tokenIn).approve(address(swapAdapter), amountIn)) revert TransferFailed();
+    ╭▸ contracts/src/OpsTreasury.sol:216:9
+216 │         swapAdapter.swapExactIn(tokenIn, address(imd), amountIn, minOut, address(this));
+    ╭▸ contracts/src/OpsTreasury.sol:217:14
+217 │         if (!IERC20Min(tokenIn).approve(address(swapAdapter), 0)) revert TransferFailed();
+    ╭▸ contracts/src/OpsTreasury.sol:222:23
+222 │         if (b > 0 && !imd.transfer(msg.sender, b)) revert TransferFailed();
+    ╭▸ contracts/src/OpsTreasury.sol:223:9
+223 │         emit Converted(tokenIn, amountIn, out, msg.sender, b);
+    ╭▸ contracts/src/GameReserve.sol:203:19
+203 │         r.total = uint128(total);
+    ╭▸ contracts/src/GameReserve.sol:204:22
+204 │         r.postedAt = uint64(block.timestamp);
+    ╭▸ contracts/src/OpsTreasury.sol:216:9
+216 │         swapAdapter.swapExactIn(tokenIn, address(imd), amountIn, minOut, address(this));
+    ╭▸ contracts/src/OpsTreasury.sol:233:22
+233 │         (bool ok,) = op.call{value: gasTopUp}("");
+    ╭▸ contracts/src/OpsTreasury.sol:233:22
+233 │         (bool ok,) = op.call{value: gasTopUp}("");
+    ╭▸ contracts/src/OpsTreasury.sol:226:23
+226 │     function topUpGas(address op) external nonReentrant {
+    ╭▸ contracts/src/OpsTreasury.sol:235:9
+235 │         emit GasToppedUp(op, gasTopUp);
+    ╭▸ contracts/src/OpsTreasury.sol:254:14
+254 │         if (!imd.transfer(payee, amount)) revert TransferFailed();
+    ╭▸ contracts/src/GameReserve.sol:216:13
+216 │         if (block.timestamp >= r.postedAt + CHALLENGE_WINDOW) revert InWindow();
+    ╭▸ contracts/src/OpsTreasury.sol:255:9
+255 │         emit WorkPaid(invoiceId, payee, amount);
+    ╭▸ contracts/src/GameReserve.sol:252:14
+252 │         if (!token.transfer(account, amount)) revert TransferFailed();
+    ╭▸ contracts/src/GameReserve.sol:253:9
+253 │         emit Claimed(epoch, index, account, amount);
+    ╭▸ contracts/src/GameReserve.sol:242:35
+242 │         if (r.root == bytes32(0)) revert NotReady();
+    ╭▸ contracts/src/GameReserve.sol:243:23
+243 │         if (r.vetoed) revert Vetoed();
+    ╭▸ contracts/src/GameReserve.sol:244:62
+244 │         if (block.timestamp < r.postedAt + CHALLENGE_WINDOW) revert InWindow();
+    ╭▸ contracts/src/GameReserve.sol:245:38
+245 │         if (isClaimed(epoch, index)) revert AlreadyClaimed();
+    ╭▸ contracts/src/GameReserve.sol:247:44
+247 │         if (!_verify(proof, r.root, leaf)) revert BadProof();
+    ╭▸ contracts/src/GameReserve.sol:248:52
+248 │         if (uint256(r.claimed) + amount > r.total) revert OverCap();
+    ╭▸ contracts/src/GameReserve.sol:252:47
+252 │         if (!token.transfer(account, amount)) revert TransferFailed();
+    ╭▸ contracts/src/GameReserve.sol:244:13
+244 │         if (block.timestamp < r.postedAt + CHALLENGE_WINDOW) revert InWindow();
+    ╭▸ contracts/src/GameReserve.sol:250:22
+250 │         r.claimed += uint128(amount);
+    ╭▸ contracts/src/GameReserve.sol:258:24
+258 │     function setPoster(address p) external onlySelf {
+    ╭▸ contracts/src/OpsTreasury.sol:287:31
+287 │     function setPaymentSigner(address s) external onlySelf {
+   ╭▸ contracts/src/TimelockedRoles.sol:57:13
+57 │         if (block.timestamp < eta) revert TooEarly();
+   ╭▸ contracts/src/TimelockedRoles.sol:61:9
+61 │         emit Executed(id, data);
+    ╭▸ contracts/test/Base.t.sol:112:17
+112 │         vm.warp(block.timestamp + 2 days);
+    ╭▸ contracts/test/Reserve.t.sol:157:21
+157 │             vm.roll(block.number + 2);
+    ╭▸ contracts/test/Treasury.t.sol:182:17
+182 │         vm.warp(block.timestamp + 3 days);
+    ╭▸ contracts/test/Treasury.t.sol:192:17
+192 │         vm.warp(block.timestamp + 3 days);
+exit=0
+$ forge test --offline
+No files changed, compilation skipped
+Ran 10 tests for contracts/test/Hardening.t.sol:HardeningTest
+[PASS] test_BlockhashFixtureUnavailableOnMainnet() (gas: 55670)
+[PASS] test_CouncilCannotRaiseHardGasCapOrSpendEssentialFloor() (gas: 209922)
+[PASS] test_DeployFixtureUsesArgumentsNotCaller() (gas: 15749823)
+[PASS] test_GasRecipientCannotReenterAndDrainMultipleTopups() (gas: 446574)
+[PASS] test_OrderFrontRunnerCannotConsumeAnotherBuyerOrder() (gas: 354906)
+[PASS] test_RequestsAndBackloggedRootsCannotBurstDailyBudget() (gas: 856370)
+[PASS] test_UnfundedVRFDoesNotLockSnapshotOrSpendReserve() (gas: 360956)
+[PASS] test_VRFWaitAuthenticateNoRerollLateFulfillmentAndClaims() (gas: 851326)
+[PASS] test_WethUsesItsOwnDustAndSpendCaps() (gas: 353694)
+[PASS] test_ZeroOracleOutputPreservesFunds() (gas: 182036)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 12.69ms (3.52ms CPU time)
+Ran 7 tests for contracts/test/TokenAndFees.t.sol:TokenAndFeesTest
+[PASS] testFuzz_PlainTransferNoTax(uint256) (runs: 256, μ: 74871, ~: 74668)
+[PASS] test_AllocationMustSumToSupply() (gas: 4743)
+[PASS] test_FeesRouteBothAssetsToTreasury() (gas: 738095)
+[PASS] test_NoMintOwnerPauseUpgradeSelectors() (gas: 140303)
+[PASS] test_SetRequesterOnlyOnceByLauncher() (gas: 67664)
+[PASS] test_ShopSplitBurnReserveTreasury() (gas: 266248)
+[PASS] test_SupplyAndAllocationExact() (gas: 79724)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 27.33ms (20.76ms CPU time)
+Ran 10 tests for contracts/test/Reserve.t.sol:ReserveTest
+[PASS] test_ClaimManyBatchesAndBlocksDuplicates() (gas: 574093)
+[PASS] test_DormancyKeepsFinalClaims() (gas: 584104)
+[PASS] test_FullCycleClaimOnceToLeafAccount() (gas: 726014)
+[PASS] test_GuardianVetoReleasesLiability() (gas: 493423)
+[PASS] test_LeafEncodingVector() (gas: 650)
+[PASS] test_MaxEmissionNeverEmptiesReserve() (gas: 22725080)
+[PASS] test_NoWithdrawPathForCouncil() (gas: 136143)
+[PASS] test_PostOverCapReverts() (gas: 269516)
+[PASS] test_RevealExpiresAfter256Blocks() (gas: 165535)
+[PASS] test_SeedMustBeCommittedBeforeEpochAndMatch() (gas: 191944)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 22.89ms (20.24ms CPU time)
+Ran 14 tests for contracts/test/Treasury.t.sol:TreasuryTest
+[PASS] testFuzz_NeverOverspendEpoch(uint256[8]) (runs: 256, μ: 706803, ~: 701593)
+[PASS] test_ConvertCapsDustAndRunwayGate() (gas: 362234)
+[PASS] test_ConvertDcpFeesWhenRunwayLow() (gas: 302962)
+[PASS] test_ConvertEpochCap() (gas: 584179)
+[PASS] test_ConvertRejectsLowMinOutAndPreservesFundsOnFailure() (gas: 680955)
+[PASS] test_EndToEndFeeToTreasuryToPaidWork() (gas: 2244829)
+[PASS] test_EssentialFloorProtected() (gas: 262892)
+[PASS] test_FreezeStopsSpendingAndNeedsTimelockToLift() (gas: 393340)
+[PASS] test_GasTopUpBounded() (gas: 201708)
+[PASS] test_PayWorkAuthority() (gas: 233827)
+[PASS] test_PayWorkCapsAndLowRunway() (gas: 892052)
+[PASS] test_PayWorkHappyPathAndDuplicateInvoice() (gas: 267545)
+[PASS] test_RecycleExcessDcpToReserve() (gas: 133045)
+[PASS] test_TreasuryAttacksFail() (gas: 390570)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 59.29ms (60.91ms CPU time)
+Ran 4 test suites in 91.79ms (122.21ms CPU time): 41 tests passed, 0 failed, 0 skipped (41 total tests)
+exit=0
+$ forge fmt --check
+exit=0
+$ FOUNDRY_FUZZ_SEED=0x1234 FOUNDRY_FUZZ_RUNS=1024 forge test --offline
+Ran 10 tests for contracts/test/Hardening.t.sol:HardeningTest
+[PASS] test_BlockhashFixtureUnavailableOnMainnet() (gas: 55670)
+[PASS] test_CouncilCannotRaiseHardGasCapOrSpendEssentialFloor() (gas: 209922)
+[PASS] test_DeployFixtureUsesArgumentsNotCaller() (gas: 15749823)
+[PASS] test_GasRecipientCannotReenterAndDrainMultipleTopups() (gas: 446574)
+[PASS] test_OrderFrontRunnerCannotConsumeAnotherBuyerOrder() (gas: 354906)
+[PASS] test_RequestsAndBackloggedRootsCannotBurstDailyBudget() (gas: 856370)
+[PASS] test_UnfundedVRFDoesNotLockSnapshotOrSpendReserve() (gas: 360956)
+[PASS] test_VRFWaitAuthenticateNoRerollLateFulfillmentAndClaims() (gas: 851326)
+[PASS] test_WethUsesItsOwnDustAndSpendCaps() (gas: 353694)
+[PASS] test_ZeroOracleOutputPreservesFunds() (gas: 182036)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 10.99ms (3.38ms CPU time)
+Ran 10 tests for contracts/test/Reserve.t.sol:ReserveTest
+[PASS] test_ClaimManyBatchesAndBlocksDuplicates() (gas: 574093)
+[PASS] test_DormancyKeepsFinalClaims() (gas: 584104)
+[PASS] test_FullCycleClaimOnceToLeafAccount() (gas: 726014)
+[PASS] test_GuardianVetoReleasesLiability() (gas: 493423)
+[PASS] test_LeafEncodingVector() (gas: 650)
+[PASS] test_MaxEmissionNeverEmptiesReserve() (gas: 22725080)
+[PASS] test_NoWithdrawPathForCouncil() (gas: 136143)
+[PASS] test_PostOverCapReverts() (gas: 269516)
+[PASS] test_RevealExpiresAfter256Blocks() (gas: 165535)
+[PASS] test_SeedMustBeCommittedBeforeEpochAndMatch() (gas: 191944)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 17.14ms (14.53ms CPU time)
+Ran 7 tests for contracts/test/TokenAndFees.t.sol:TokenAndFeesTest
+[PASS] testFuzz_PlainTransferNoTax(uint256) (runs: 1024, μ: 74801, ~: 74656)
+[PASS] test_AllocationMustSumToSupply() (gas: 4743)
+[PASS] test_FeesRouteBothAssetsToTreasury() (gas: 738095)
+[PASS] test_NoMintOwnerPauseUpgradeSelectors() (gas: 140303)
+[PASS] test_SetRequesterOnlyOnceByLauncher() (gas: 67664)
+[PASS] test_ShopSplitBurnReserveTreasury() (gas: 266248)
+[PASS] test_SupplyAndAllocationExact() (gas: 79724)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 66.36ms (61.54ms CPU time)
+Ran 14 tests for contracts/test/Treasury.t.sol:TreasuryTest
+[PASS] testFuzz_NeverOverspendEpoch(uint256[8]) (runs: 1024, μ: 706521, ~: 702185)
+[PASS] test_ConvertCapsDustAndRunwayGate() (gas: 362234)
+[PASS] test_ConvertDcpFeesWhenRunwayLow() (gas: 302962)
+[PASS] test_ConvertEpochCap() (gas: 584179)
+[PASS] test_ConvertRejectsLowMinOutAndPreservesFundsOnFailure() (gas: 680955)
+[PASS] test_EndToEndFeeToTreasuryToPaidWork() (gas: 2244829)
+[PASS] test_EssentialFloorProtected() (gas: 262892)
+[PASS] test_FreezeStopsSpendingAndNeedsTimelockToLift() (gas: 393340)
+[PASS] test_GasTopUpBounded() (gas: 201708)
+[PASS] test_PayWorkAuthority() (gas: 233827)
+[PASS] test_PayWorkCapsAndLowRunway() (gas: 892052)
+[PASS] test_PayWorkHappyPathAndDuplicateInvoice() (gas: 267545)
+[PASS] test_RecycleExcessDcpToReserve() (gas: 133045)
+[PASS] test_TreasuryAttacksFail() (gas: 390570)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 257.37ms (259.35ms CPU time)
+Ran 4 test suites in 288.95ms (351.85ms CPU time): 41 tests passed, 0 failed, 0 skipped (41 total tests)
+exit=0
+$ forge script contracts/script/DeployLocal.s.sol --offline   # simulation, no --broadcast
+No files changed, compilation skipped
+Script ran successfully.
+Gas used: 8256141
+== Logs ==
+  DCP 0x45127f27819f45d1b72ef80e9a151a9DC8470207
+  GameReserve 0x89d319e6798816baCC38D6B4f7b2B490d5acaEb3
+  OpsTreasury 0xd26cAA59c4E6f180797be4A2bf56f6f47DEB5755
+  GameShop 0xb0ef3f1ac2AF8BB1A6d8A529E3e0ff124e655BB5
+  MockIMDFactory 0xa40a556c824de3b0E08B454E5cc1c9E29B3540ED
+exit=0

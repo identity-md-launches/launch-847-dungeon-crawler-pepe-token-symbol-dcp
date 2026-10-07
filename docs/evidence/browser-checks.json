@@ -1,0 +1,183 @@
+{
+  "date": "2026-10-07T18:40:41.920Z",
+  "browser": "145.0.7632.6",
+  "checks": [
+    "Adult dialog traps focus; static outage offers an explicit practice choice",
+    "Class selection, keyboard creation, perk selection and reload preserve practice state",
+    "Played 24 route/combat/quest actions through visible controls",
+    "Rankings, shop, operations and rules work; background hotkeys cannot mutate a run",
+    "Integrated server: guest create, character save, simulated wallet, order, payment and finalized inventory credit",
+    "Recoverable sign-in error; Escape restores dialog focus",
+    "Second browser context recovers the server account and saved Crawler",
+    "Reduced motion removes transitions; forced colors retains focus; 720px reflow"
+  ],
+  "screenshots": [
+    "desktop-onboarding.png",
+    "mobile-onboarding.png",
+    "desktop-game.png",
+    "mobile-game.png",
+    "integrated-status.png"
+  ],
+  "viewports": [
+    {
+      "label": "onboarding",
+      "width": 1440,
+      "scroll": 1440,
+      "overflow": []
+    },
+    {
+      "label": "onboarding",
+      "width": 900,
+      "scroll": 900,
+      "overflow": []
+    },
+    {
+      "label": "onboarding",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "onboarding",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "game",
+      "width": 900,
+      "scroll": 900,
+      "overflow": []
+    },
+    {
+      "label": "game",
+      "width": 390,
+      "scroll": 390,
+      "overflow": []
+    },
+    {
+      "label": "game",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "rankings",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "practice shop",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "practice status",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "field guide",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "integrated loot",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "integrated status",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "integrated board",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "integrated about",
+      "width": 320,
+      "scroll": 320,
+      "overflow": []
+    },
+    {
+      "label": "200% equivalent CSS viewport",
+      "width": 720,
+      "scroll": 720,
+      "overflow": []
+    }
+  ],
+  "errors": [],
+  "resources": [
+    {
+      "url": "http://127.0.0.1:PORT/api/auth/recover",
+      "status": 404
+    }
+  ],
+  "axe": [
+    {
+      "label": "onboarding",
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ],
+      "passes": 27
+    },
+    {
+      "label": "game",
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ],
+      "passes": 27
+    },
+    {
+      "label": "integrated status",
+      "violations": [],
+      "incomplete": [],
+      "passes": 24
+    }
+  ],
+  "contrast": [
+    {
+      "selector": "body",
+      "foreground": "rgb(238, 238, 222)",
+      "background": "rgb(16, 18, 15)",
+      "ratio": 16.07
+    },
+    {
+      "selector": ".worldline",
+      "foreground": "rgb(167, 176, 155)",
+      "background": "rgb(16, 18, 15)",
+      "ratio": 8.36
+    },
+    {
+      "selector": ".tab.active",
+      "foreground": "rgb(180, 214, 110)",
+      "background": "rgb(34, 39, 30)",
+      "ratio": 9.28
+    },
+    {
+      "selector": ".sheet .small",
+      "foreground": "rgb(167, 176, 155)",
+      "background": "rgb(24, 28, 22)",
+      "ratio": 7.67
+    },
+    {
+      "selector": "#recoverBtn",
+      "foreground": "rgb(167, 176, 155)",
+      "background": "rgb(34, 39, 30)",
+      "ratio": 6.77
+    }
+  ],
+  "result": "passed"
+}

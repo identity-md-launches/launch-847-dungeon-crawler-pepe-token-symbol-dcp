@@ -45,7 +45,7 @@ Read [the review and open defects](docs/review.md), [launch readiness and costs]
 
 Public GitHub publication and independent contributor sign-off are still outstanding. GitHub CLI reported no authenticated hosts, and this assignment forbids writing `.git/`. Source is delivered in this working tree for the IMD publisher; no public URL is claimed. The project is useful for local play and review, but **not ready to operate with real funds**.
 
-`python3 scripts/package-source.py` reproduces the [offline source handoff](artifacts/dcp-source.tar.gz), including the existing Foundry dependency sources, tests, ABI files and static export. It excludes runtime data, credentials, `.git`, `.github`, installed package directories and scratch tests.
+`python3 scripts/package-source.py` writes an offline source handoff to `artifacts/dcp-source.tar.gz` (a local output; `artifacts/` is not part of the delivered tree), including the existing Foundry dependency sources, tests, ABI files and static export. It excludes runtime data, credentials, `.git`, `.github`, installed package directories and scratch tests.
 
 ## Browser interface and static practice (this contribution)
 
@@ -77,7 +77,7 @@ npm run check:browser --prefix web
 
 The production build is the deterministic public allowlist copy in `scripts/build-web.mjs`; there is no Vite migration, remote asset fetch or runtime bundle dependency. Build can run offline without npm installation. Checking tools install from the lockfile; repeat installation offline requires your normal npm cache. Do not commit installed dependencies, browser downloads or caches. Browser checks can use provisioned tooling with `DCP_PLAYWRIGHT_MODULE`, `DCP_CHROMIUM_PATH` and `DCP_AXE_PATH` pointing to local installed files. The checker creates ephemeral local servers/SQLite state and writes evidence under `artifacts/`.
 
-Actual results on 2026-10-06: production export and JavaScript typecheck passed; **32 Node tests** and **41 offline Solidity tests** passed, including a second 1,024-run fuzz seed. The 120-player/four-day simulation and two durable unattended content cycles passed. Chromium validated the static subpath and integrated purchase/recovery flows at desktop/mobile widths; sampled axe audits reported no violations, with some contrast checks requiring manual interpretation. Logs/screenshots and exact limits are in [the interface review](docs/interface-review.md) and `artifacts/`.
+Actual results on 2026-10-06: production export and JavaScript typecheck passed; **32 Node tests** and **41 offline Solidity tests** passed, including a second 1,024-run fuzz seed. The 120-player/four-day simulation and two durable unattended content cycles passed. Chromium validated the static subpath and integrated purchase/recovery flows at desktop/mobile widths; sampled axe audits reported no violations, with some contrast checks requiring manual interpretation. Logs/screenshots and exact limits are in [the interface review](docs/interface-review.md) and [`docs/evidence/`](docs/evidence/).
 
 ### Source publication and later site publication
 

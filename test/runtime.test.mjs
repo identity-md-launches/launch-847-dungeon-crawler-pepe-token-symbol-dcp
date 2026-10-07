@@ -255,6 +255,27 @@ test('milestone caps preserve pending amounts; simulated final claims survive ke
   await assert.rejects(app.chain.claim(reward.epoch, reward.leaf_index, reward.wallet, BigInt(reward.amount), reward.proof), /AlreadyClaimed/);
 });
 
+test('guardian veto returns earned milestones to pending instead of stranding them in a void root', async (t) => {
+  const { app, guest } = fixture(t);
+  wallet(app, guest);
+  recordDepth(app.db, guest.accountId, 1, 3);
+  const cfg = { ...defaultEconomyConfig(), minAccountAgeMs: 0, minActions: 0, challengeMs: 3600_000 };
+  const go = (e) => advanceEpochs(app.db, app.chain, cfg, { currentEpoch: e, dayOf: (x) => x - 1, now: app.now() });
+  await go(1); advance(app, 2 * 86400_000); await go(3);
+  const rooted = rewardsFor(app.db, guest.accountId)[0];
+  assert.equal(rooted.status, 'rooted');
+  // SimChain has no guardian call; model GameReserve.veto inside the challenge window.
+  const round = app.chain.round(rooted.epoch);
+  round.vetoed = true; app.chain.reserve.outstanding -= round.total;
+  advance(app, 3600_001); await go(3);
+  assert.deepEqual(rewardsFor(app.db, guest.accountId).map((r) => [r.status, r.epoch]), [['pending', null]]);
+  await go(4); advance(app, 2 * 86400_000); await go(6); advance(app, 3600_001); await go(6);
+  const [paid] = rewardsFor(app.db, guest.accountId);
+  assert.equal(paid.status, 'claimable');
+  assert.notEqual(paid.epoch, rooted.epoch);
+  assert.equal(BigInt(paid.amount), 25n * E18);
+});
+
 test('HTTP demo serves static frontend, API actions and safe malformed requests; launch disabled', async (t) => {
   const { app } = fixture(t, { webRoot: resolve('web') });
   const server = await app.listen(0, '127.0.0.1');

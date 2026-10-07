@@ -188,7 +188,16 @@ export async function advanceEpochs(db, chain, cfg, { currentEpoch, dayOf, now =
       }
       if (ep.status === 'posted' && now - ep.updated_at >= cfg.challengeMs) {
         const state = await chain.roundState(ep.epoch);
-        if (state.vetoed) { run(db, "UPDATE epochs SET status = 'vetoed' WHERE epoch = ?", ep.epoch); continue; }
+        if (state.vetoed) {
+          // A vetoed root pays nothing: earned milestones return to pending for a later root;
+          // that epoch's top/draw leaves are void rather than liabilities forever.
+          tx(db, () => {
+            run(db, "UPDATE rewards SET status = 'pending', epoch = NULL, leaf_index = NULL, wallet = NULL, proof = NULL WHERE epoch = ? AND status = 'rooted' AND kind = 'milestone'", ep.epoch);
+            run(db, "UPDATE rewards SET status = 'vetoed' WHERE epoch = ? AND status = 'rooted'", ep.epoch);
+            run(db, "UPDATE epochs SET status = 'vetoed' WHERE epoch = ?", ep.epoch);
+          });
+          continue;
+        }
         if (BigInt(ep.total) > 0n && (!state.root || now / 1000 < state.postedAt + cfg.challengeMs / 1000)) continue;
         run(db, "UPDATE rewards SET status = 'claimable' WHERE epoch = ? AND status = 'rooted'", ep.epoch);
         run(db, "UPDATE epochs SET status = 'final', updated_at = ? WHERE epoch = ?", now, ep.epoch);
