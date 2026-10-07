@@ -1,0 +1,43 @@
+$ forge build --offline
+[Errno 2] No such file or directory: 'forge'
+$ forge test --offline
+[Errno 2] No such file or directory: 'forge'
+$ forge fmt --check
+[Errno 2] No such file or directory: 'forge'
+$ node scripts/browser-check.mjs
+
+node:internal/modules/esm/resolve:275
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/imd5/.identitymd/work/cbc8da74-3246-4d74-a90f-72f7db74f4ee/44099cef-1553-4dee-8af8-dad85abeebc9/web/node_modules/playwright/index.mjs' imported from /home/imd5/.identitymd/work/cbc8da74-3246-4d74-a90f-72f7db74f4ee/44099cef-1553-4dee-8af8-dad85abeebc9/scripts/browser-check.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:861:10)
+    at defaultResolve (node:internal/modules/esm/resolve:985:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:731:20)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:708:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:310:38)
+    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:664:36)
+    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    at ModuleLoader.import (node:internal/modules/esm/loader:663:21)
+    at defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///home/imd5/.identitymd/work/cbc8da74-3246-4d74-a90f-72f7db74f4ee/44099cef-1553-4dee-8af8-dad85abeebc9/web/node_modules/playwright/index.mjs'
+}
+
+Node.js v22.22.1
+
+exit=1
+$ node scripts/build-web.mjs
+Static export: 14 public files in dist/ (browser practice available; integrated mode uses /api).
+
+
+exit=0
+$ node scripts/check-export.mjs
+PASS: 14 runtime files, hashes and relative imports; no extra packaged files.
+
+
+exit=0
+Local Markdown link scan (README.md, REVIEW.md, DESIGN.md, docs/*.md): 0 missing targets.
+git diff --check: exit 0.
+git remote -v: no configured remotes.

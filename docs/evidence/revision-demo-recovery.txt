@@ -1,0 +1,43 @@
+$ node scripts/demo.mjs
+
+file:///home/imd5/.identitymd/work/cbc8da74-3246-4d74-a90f-72f7db74f4ee/44099cef-1553-4dee-8af8-dad85abeebc9/scripts/demo.mjs:5
+if (Number(process.versions.node.split('.')[0]) < 24) throw new Error('Node 24+ is required for built-in SQLite.');
+                                                            ^
+
+Error: Node 24+ is required for built-in SQLite.
+    at file:///home/imd5/.identitymd/work/cbc8da74-3246-4d74-a90f-72f7db74f4ee/44099cef-1553-4dee-8af8-dad85abeebc9/scripts/demo.mjs:5:61
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.22.1
+
+exit=1
+$ node scripts/recover.mjs check /tmp/dcp-recovery-0ty4yzev/save.sqlite
+DCP database integrity: ok
+
+(node:19) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+exit=0
+$ node scripts/recover.mjs backup /tmp/dcp-recovery-0ty4yzev/save.sqlite /tmp/dcp-recovery-0ty4yzev/snapshot.sqlite
+backup: verified /tmp/dcp-recovery-0ty4yzev/snapshot.sqlite
+
+(node:26) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+exit=0
+$ node scripts/recover.mjs restore /tmp/dcp-recovery-0ty4yzev/snapshot.sqlite /tmp/dcp-recovery-0ty4yzev/restored.sqlite
+restore: verified /tmp/dcp-recovery-0ty4yzev/restored.sqlite
+
+(node:33) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+exit=0
+$ node scripts/recover.mjs check /tmp/dcp-recovery-0ty4yzev/restored.sqlite
+DCP database integrity: ok
+
+(node:40) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+exit=0

@@ -123,6 +123,7 @@ export class RpcChain {
     return wordToBytes32(words[2]);
   }
   async postRoot(e, root, total) { await this.send(this.keeper, this.addr.reserve, calldata('postRoot(uint256,bytes32,uint256)', ['uint256', 'bytes32', 'uint256'], [e, root, total])); }
+  async lastPostedEpoch() { return Number(await this.word(this.addr.reserve, 'lastPostedEpoch()')); }
   async roundState(e) {
     const w = decodeWords(await this.call(this.addr.reserve, calldata('rounds(uint256)', ['uint256'], [e])));
     const hash = (i) => w[i] === 0n ? null : wordToBytes32(w[i]);

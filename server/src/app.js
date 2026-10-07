@@ -6,7 +6,7 @@ import { randomBytes, createHash } from 'node:crypto';
 import { openDb, one, all, run, getMeta, setMeta } from './db.js';
 import { GameService, GameError } from './game/service.js';
 import { createGuest, sessionFrom, logout, recover, issueNonce, verifySignIn, recordSignal, siweMessage } from './auth.js';
-import { SKUS, createOrder, creditPurchase, ownedSkus } from './shop.js';
+import { SKUS, skuBy, createOrder, creditPurchase, ownedSkus } from './shop.js';
 import { rewardsFor, markClaimed, defaultEconomyConfig } from './economy.js';
 import { Indexer } from './chain/indexer.js';
 import { SimChain } from './chain/sim.js';
@@ -69,7 +69,10 @@ export function createApp(cfg) {
     const chunks = [];
     for await (const c of req) { size += c.length; if (size > 16_384) throw new HttpError(413, 'body too large'); chunks.push(c); }
     if (!chunks.length) return {};
-    try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new HttpError(400, 'invalid JSON'); }
+    let value;
+    try { value = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new HttpError(400, 'invalid JSON'); }
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new HttpError(400, 'JSON object required');
+    return value;
   }
   const auth = (req) => {
     const h = req.headers.authorization ?? '';
@@ -103,6 +106,7 @@ export function createApp(cfg) {
     'GET /api/auth/nonce': (req, url) => {
       if (!authLimiter.take('nonce:' + ipOf(req))) throw new HttpError(429, 'slow down');
       const address = url.searchParams.get('address');
+      if (!/^0x[0-9a-fA-F]{40}$/.test(address ?? '')) throw new HttpError(400, 'valid wallet address required');
       const nonce = issueNonce(db, address);
       const issuedAt = new Date().toISOString();
       const expirationTime = new Date(Date.now() + 5 * 60_000).toISOString();
@@ -111,6 +115,7 @@ export function createApp(cfg) {
     'POST /api/auth/verify': async (req) => {
       if (!authLimiter.take('verify:' + ipOf(req))) throw new HttpError(429, 'slow down');
       const b = await body(req);
+      if (typeof b.message !== 'string' || typeof b.signature !== 'string') throw new HttpError(400, 'message and signature required');
       const h = req.headers.authorization ?? '';
       const cur = sessionFrom(db, h.startsWith('Bearer ') ? h.slice(7) : null);
       try {
@@ -148,6 +153,7 @@ export function createApp(cfg) {
     'POST /api/orders': async (req) => {
       const s = auth(req);
       const b = await body(req);
+      if (!['number', 'string'].includes(typeof b.sku) || !skuBy(b.sku)) throw new HttpError(400, 'unknown sku');
       const o = createOrder(db, s.account_id, b.sku);
       const c = cfg.contracts;
       const txs = c?.shop ? {
@@ -172,6 +178,7 @@ export function createApp(cfg) {
       demoOnly();
       const s = auth(req);
       const { orderId } = await body(req);
+      if (typeof orderId !== 'string' || !/^0x[0-9a-fA-F]{64}$/.test(orderId)) throw new HttpError(400, 'valid orderId required');
       const o = one(db, 'SELECT * FROM orders WHERE order_id = ? AND account_id = ?', orderId, s.account_id);
       if (!o) throw new HttpError(404, 'no such order');
       const w = one(db, 'SELECT wallet FROM accounts WHERE id = ?', s.account_id).wallet;

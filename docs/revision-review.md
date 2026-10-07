@@ -1,0 +1,41 @@
+# Revision review · 2026-10-07
+
+This revision preserves the accepted implementation. It evaluates the supplied independent reports, rather than treating inherited passes as proof. It is an implementer's response, not a new independent sign-off. No deployment, mint, pool, paid work, service subscription or companion-worker network was introduced. Production remains disabled.
+
+## Findings and dispositions
+
+**High — epoch root ordering (fixed).** `node --test test/revision.test.mjs` reproduced both transient post failure and lost-successful-response overtaking before the fix: epoch 3 was posted while epoch 2 remained drawn. See [pre-fix failures](evidence/revision-before.txt). The per-epoch catch now stops the backlog. The next tick checks the existing root before sending; a successful transaction with a lost response is not posted twice. Challenge-delayed finalization does not itself block later posts.
+
+Recovery also handles databases affected by the old code: a drawn round with no on-chain root and an epoch at or below the authoritative `lastPostedEpoch` returns **all** rooted prizes (including top/draw) to pending, clears stale proofs, and expires that round. Pending recovered prizes keep their kind, amount and original reference; the normal eligibility, cluster and epoch caps apply, with no partial loss when there is insufficient room. The SimChain and RPC adapters expose the existing contract getter. The recovery regression emulates a superseded root, checks the 875 DCP is reoffered once, finalizes it and compares liabilities with chain outstanding. A mismatched existing root remains an error; it is never rolled forward. RPC signing/confirmation infrastructure remains unsupported, and this does not implement reorg compensation.
+
+**Medium — chunked conversion bounties (confirmed; policy deferred).** Source arithmetic confirms `min(bounty, out/10)` is per call. At the reported fixture quote, three 1,000,000 DCP calls return 3,000 IMD and pay 15; 300 calls of 10,000 DCP return the same amount and pay 300. Both consume the 3,000,000 input allowance. No per-epoch bounty cap exists. These are arithmetic/code observations, **not** a fresh Foundry run. The report holds; keeping the documented per-call behavior avoids choosing a new treasury policy in this revision. The launch plan now states aggregate exposure explicitly. It remains a funded-launch blocker pending a reviewed bounty policy alongside the existing slippage finding.
+
+**Medium — Overtime fame farming (confirmed; game policy deferred).** Run `node scripts/review-overtime.mjs`. It uses an isolated in-memory account, places a character at depth 3, and inflates survival stats to isolate score accounting. Thirty overtime floors leave depth unchanged while daily fame grows; [the recorded output](evidence/revision-overtime.txt) includes actions and fame. Routes/counts vary because character IDs/seeds vary. The engine regenerates unlimited same-depth floors and the service credits positive fame deltas without depth eligibility. No iteration cap exists. This establishes the farming mechanism; it does not measure an ordinary character's exact survival/throughput or prove multi-network capture. Changing score eligibility would change the accepted game economy, so gameplay remains intact and the former “economically unproven” wording is corrected. Competitive abuse stays a launch blocker.
+
+**Low — malformed HTTP input (fixed).** The new HTTP regression reproduces invalid/missing nonce addresses, unknown SKU, missing demo order ID and null bodies across the reported routes. JSON bodies must be objects; addresses, SKU and order IDs are validated before service/SQLite calls. Missing verification strings receive a validation message. These requests now return 400 without internal stack logging; the regression checks both status and the log sink. Unexpected server faults still return generic 500 and log diagnostics.
+
+**Info — immutable VRF lifecycle (documentation fixed).** Inspection confirms one-shot source binding, immutable coordinator/subscription configuration, no withdrawal and no replacement path; the local seed fixture cannot operate on production chain IDs. The report is accurate. The NatSpec no longer promises a reserve migration and the launch plan explains permanent future-emission loss on provider failure. No transfer/rebinding authority was added. Live coordinator failure was not tested here; existing contract tests are historical evidence only in this environment.
+
+## Current verification
+
+| Check | Current result | Evidence |
+| --- | --- | --- |
+| Inherited Node baseline | 34/34 before edits | Existing suite run locally; new failures retained separately |
+| Full Node suite | 38/38 on Node 22.22.1, SQLite experimental warning | [revision-node-tests.txt](evidence/revision-node-tests.txt) |
+| Export build/hash/module graph | Pass; 14 files, unchanged `dist/` | [revision-tool-checks.txt](evidence/revision-tool-checks.txt) |
+| Foundry build/test/format | Blocked: `forge` executable absent | same |
+| Browser checker | Blocked: `ERR_MODULE_NOT_FOUND` for `web/node_modules/playwright/index.mjs` | same |
+| Demo launcher | Correctly refuses installed Node 22.22.1; requires Node 24+ | [revision-demo-recovery.txt](evidence/revision-demo-recovery.txt) |
+| Recovery CLI | check, backup, restore to new target, check all exit 0 on fixture DB | same |
+
+The inherited API/static-serving integration test and new HTTP regression pass under the available Node 22 runtime. This is not a substitute for running the supported Node 24 demo launcher or browser QA. No dependencies were installed or made necessary by this revision. Historical 41 Solidity tests and eight browser flows in [continuation review](continuation-review.md) were not rerun successfully here; their logs remain dated historical evidence.
+
+## Review coverage and site assessment
+
+Reviewed the reserve/root accounting, treasury setters and conversion limits, token allocation and shop payment/claim guards against the supplied reports. Existing tests exercise single-use SIWE nonces, domain/chain/signature binding, guest recovery, action IDs with changed retries and stale revisions, payment finality, duplicate entitlements, unauthorized character access, veto reconciliation, malformed/injected content and rollback. All continue to pass. Custom cryptography, EIP-1271, real wallet selection and mobile behavior still need independent review; reusable recovery credentials remain bearer secrets. RPC indexer range handling, durable signer journals, gas/fork behavior and off-host recovery remain open as documented in the prior review.
+
+Inspected finished `dist/index.html`, frontend flows and the export graph against the server: DCP branding, adult comic notice, non-graphic tone, build/review labeling, simulation/practice distinctions, no investment/return guarantee, 30/50/20 shop split and depth gate remain accurate. There are no new money claims, remote scripts or wallet addresses. No site correction was required. Export byte checks pass; fresh rendered accessibility, screenshots and real-wallet QA are blocked by the missing browser tool. The earlier independent-review findings are answered here, but this author cannot supply an independent site sign-off or legal approval.
+
+All previously repaired evidence/documentation links remain in the delivered `docs/evidence/` tree. The source tree plus committed `dist/` remain the runnable handoff; `python3 scripts/package-source.py` generates an optional local archive. Git has no configured remote in this workspace, so public publication cannot be completed here; no push or new public URL is claimed. The existing project destination is recorded in the task history. An authorized publisher must upload this source there and record its commit.
+
+[Launch readiness](launch-readiness.md) continues to require IMD integration/authority proof, real VRF subscription, funding, hosting and council/guardian/poster/payment-signer provisioning. Fixture cycles and simulated invoices are not autonomous production evidence. Treasury bounty and competitive farming policy, immutable VRF lifecycle and independent funded-launch review remain unresolved. There is no launch approval.

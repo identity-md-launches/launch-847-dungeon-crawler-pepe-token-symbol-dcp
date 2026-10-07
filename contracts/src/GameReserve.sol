@@ -122,7 +122,7 @@ contract GameReserve is TimelockedRoles {
 
     // ------------------------------------------------------------------ poster
 
-    /// One-time binding. A new provider requires a separately reviewed reserve migration.
+    /// Irreversible binding: no source replacement or reserve balance migration exists.
     function setRandomnessSource(address source) external onlySelf {
         if (address(randomnessSource) != address(0) || source.code.length == 0) revert AlreadySet();
         randomnessSource = IPrizeRandomness(source);

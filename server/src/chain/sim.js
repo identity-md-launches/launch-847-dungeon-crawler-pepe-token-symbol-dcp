@@ -119,6 +119,7 @@ export class SimChain {
   freeBalance() { const b = this.balanceOf('DCP', this.addr.reserve); return b > this.reserve.outstanding ? b - this.reserve.outstanding : 0n; }
   epochCap() { const c = (this.freeBalance() * this.reserve.epochBps) / 10000n; return c < this.reserve.epochAbsCap ? c : this.reserve.epochAbsCap; }
   round(e) { if (!this.reserve.rounds.has(e)) this.reserve.rounds.set(e, { claimed: 0n }); return this.reserve.rounds.get(e); }
+  async lastPostedEpoch() { return this.reserve.lastPosted; }
   async roundState(e) { return { ...this.round(e) }; }
   async commitSeed(e, seedHash, currentEpoch) {
     this.maybeFail();

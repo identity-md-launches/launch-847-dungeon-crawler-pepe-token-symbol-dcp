@@ -40,7 +40,9 @@ A definitive all-in bootstrap price is **unavailable** because no provider quote
 | Reward integration | Backend demo still uses legacy fixture epochs. VRF contract path needs frozen snapshot publication, score review, chain genesis alignment and finalized receipt/reorg reconciliation | Backend operator and guardian complete integration; test loss of RPC, key, callback and root veto before any valuable draw |
 | Runtime provisioning | Docker is a local template; no host/DB/RPC/indexer/backups/failover was externally provisioned | Infrastructure operator supplies paid durable hosts, private backups, recovery drills, DNS/TLS and secondary operator |
 | Essential funding | Treasury floor cannot itself pay hosting bills; it is deliberately protected from `payWork` | Infrastructure/finance operators arrange prepaid service runway and a reviewed bounded essential-payment route |
-| Competitive abuse | Sybil heuristics, slot advantage, indefinite Overtime/fame farming and score-authority trust remain | Independent game/economy reviewer runs adversarial farm trials and approves prize eligibility limits |
+| Competitive abuse | Sybil heuristics, slot advantage, confirmed indefinite Overtime/fame farming and score-authority trust remain | Independent game/economy reviewer runs adversarial farm trials and approves prize eligibility limits |
+| Conversion bounty | Dust-floor chunking reaches 10% of aggregate output; no epoch-wide bounty allowance | Review and approve a bounded bounty policy before treasury funding |
+| VRF lifecycle | Source binding and provider configuration are irreversible; no reserve migration exists | Resolve provider retirement/subscription-loss risk before reserve funding |
 
 Automatic season rollover, parties, generated quest schema v2, new engine primitives, EIP-1271 wallet authentication and full browser/device QA are also unfinished. They must not be advertised as delivered capabilities. Deep reorg recovery currently stops settlement for operator reconciliation rather than automatically repairing consumed entitlements. Production cannot be enabled simply by switching a flag.
 

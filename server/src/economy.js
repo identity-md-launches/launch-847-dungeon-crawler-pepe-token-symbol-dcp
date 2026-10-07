@@ -75,7 +75,7 @@ function drawIndex(randomness, i, total) {
  * and the inputs are stored in the epoch snapshot so anyone can recompute the draw.
  */
 export function computeEpoch(db, cfg, { epoch, day, randomness, budget, now = Date.now() }) {
-  const pending = all(db, "SELECT * FROM rewards WHERE status = 'pending' AND kind = 'milestone' ORDER BY id");
+  const pending = all(db, "SELECT * FROM rewards WHERE status = 'pending' ORDER BY id");
   const fame = all(db, 'SELECT d.account_id, d.fame FROM daily_fame d WHERE d.day = ? AND d.fame > 0 ORDER BY d.fame DESC, d.account_id', day);
   const elig = new Map();
   const check = (id) => { if (!elig.has(id)) elig.set(id, eligible(db, cfg, id, now)); return elig.get(id); };
@@ -88,16 +88,16 @@ export function computeEpoch(db, cfg, { epoch, day, randomness, budget, now = Da
     const c = cluster.get(accountId);
     const used = clusterSpent.get(c) ?? 0n;
     const room = cfg.perAccountEpochCap - used;
-    // Never discard the unpaid remainder of an earned milestone.
-    if (room <= 0n || spent + amount > budget || (kind === 'milestone' && amount > room)) return false;
+    // Never discard the unpaid remainder of an earned or recovered reward.
+    if (room <= 0n || spent + amount > budget || (rewardId && amount > room)) return false;
     const amt = amount <= room ? amount : room;
     clusterSpent.set(c, used + amt);
     spent += amt;
     leaves.push({ accountId, wallet: check(accountId).wallet, amount: amt, kind, ref, rewardId });
     return true;
   };
-  // 1) milestones (oldest first)
-  for (const r of pending) if (check(r.account_id).ok) add(r.account_id, BigInt(r.amount), 'milestone', r.ref, r.id);
+  // 1) earned milestones and recovered prizes (oldest first)
+  for (const r of pending) if (check(r.account_id).ok) add(r.account_id, BigInt(r.amount), r.kind, r.ref, r.id);
   // 2) top daily fame gains (leaderboard-eligible characters only; revived runs excluded upstream)
   const eligFame = fame.filter((f) => check(f.account_id).ok);
   const top = eligFame.slice(0, TOP_PRIZES.length);
@@ -181,6 +181,16 @@ export async function advanceEpochs(db, chain, cfg, { currentEpoch, dayOf, now =
       if (ep.status === 'drawn') {
         const state = await chain.roundState(ep.epoch);
         if (state.root && (state.root !== ep.root || state.total !== BigInt(ep.total))) throw new Error('Posted root mismatch');
+        // Old versions could post a later round after a transient failure. Only
+        // recover an absent root after confirming the monotonic on-chain cursor.
+        if (!state.root && ep.epoch <= await chain.lastPostedEpoch()) {
+          tx(db, () => {
+            run(db, "UPDATE rewards SET status = 'pending', epoch = NULL, leaf_index = NULL, wallet = NULL, proof = NULL WHERE epoch = ? AND status = 'rooted'", ep.epoch);
+            run(db, "UPDATE epochs SET status = 'expired', updated_at = ? WHERE epoch = ?", now, ep.epoch);
+          });
+          log(`epoch ${ep.epoch}: superseded absent root; all prizes roll forward`);
+          continue;
+        }
         if (BigInt(ep.total) > 0n && !state.root) await chain.postRoot(ep.epoch, ep.root, BigInt(ep.total));
         run(db, "UPDATE epochs SET status = 'posted', updated_at = ? WHERE epoch = ?", now, ep.epoch);
         ep.status = 'posted';
@@ -205,6 +215,9 @@ export async function advanceEpochs(db, chain, cfg, { currentEpoch, dayOf, now =
     } catch (e) {
       log(`epoch ${ep.epoch}: ${e.message} (will retry)`);
       run(db, "INSERT INTO outages(component, started_at, ended_at, note) VALUES('epoch', ?, ?, ?)", now, now, `epoch ${ep.epoch}: ${e.message}`);
+      // No later root may overtake an unresolved earlier round. A lost receipt
+      // is reconciled from roundState on the next tick before posting continues.
+      break;
     }
   }
 }

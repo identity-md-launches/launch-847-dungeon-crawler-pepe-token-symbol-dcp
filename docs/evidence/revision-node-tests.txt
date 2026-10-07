@@ -1,0 +1,242 @@
+TAP version 13
+# Subtest: keccak256 matches cast
+ok 1 - keccak256 matches cast
+  ---
+  duration_ms: 1.920246
+  type: 'test'
+  ...
+# Subtest: address derivation and personal_sign round-trip match cast
+ok 2 - address derivation and personal_sign round-trip match cast
+  ---
+  duration_ms: 12.542879
+  type: 'test'
+  ...
+# Subtest: Merkle leaf encoding matches GameReserve (shared vector with Reserve.t.sol)
+ok 3 - Merkle leaf encoding matches GameReserve (shared vector with Reserve.t.sol)
+  ---
+  duration_ms: 1.005192
+  type: 'test'
+  ...
+# Subtest: ABI calldata matches cast
+ok 4 - ABI calldata matches cast
+  ---
+  duration_ms: 0.376277
+  type: 'test'
+  ...
+# Subtest: EIP-1559 signing matches cast (cast decode-transaction recovers the anvil signer)
+ok 5 - EIP-1559 signing matches cast (cast decode-transaction recovers the anvil signer)
+  ---
+  duration_ms: 1.797669
+  type: 'test'
+  ...
+# Subtest: same seed + same choices replays identically (retries/reloads cannot reroll)
+ok 6 - same seed + same choices replays identically (retries/reloads cannot reroll)
+  ---
+  duration_ms: 61.861966
+  type: 'test'
+  ...
+# Subtest: different characters diverge: routes, offers and encounters differ
+ok 7 - different characters diverge: routes, offers and encounters differ
+  ---
+  duration_ms: 0.856256
+  type: 'test'
+  ...
+# Subtest: every generated offer is a valid, budgeted, distinct combination
+ok 8 - every generated offer is a valid, budgeted, distinct combination
+  ---
+  duration_ms: 21.642531
+  type: 'test'
+  ...
+# Subtest: substantial play across all archetypes and classes runs without engine faults
+ok 9 - substantial play across all archetypes and classes runs without engine faults
+  ---
+  duration_ms: 461.983224
+  type: 'test'
+  ...
+# Subtest: illegal engine moves are rejected (service tests verify transactional rollback)
+ok 10 - illegal engine moves are rejected (service tests verify transactional rollback)
+  ---
+  duration_ms: 0.718701
+  type: 'test'
+  ...
+# Subtest: depth gate blocks descending past the daily limit; Overtime keeps play going
+ok 11 - depth gate blocks descending past the daily limit; Overtime keeps play going
+  ---
+  duration_ms: 0.340781
+  type: 'test'
+  ...
+# Subtest: full power slots require an explicit replacement
+ok 12 - full power slots require an explicit replacement
+  ---
+  duration_ms: 0.356971
+  type: 'test'
+  ...
+# Subtest: death is permanent for the character and recorded
+ok 13 - death is permanent for the character and recorded
+  ---
+  duration_ms: 0.285599
+  type: 'test'
+  ...
+# Subtest: quest choices write history that later callbacks and floors react to
+ok 14 - quest choices write history that later callbacks and floors react to
+  ---
+  duration_ms: 0.513451
+  type: 'test'
+  ...
+# Subtest: practice persists distinct runs and repeated actions; rejects stale edits and monetary routes
+ok 15 - practice persists distinct runs and repeated actions; rejects stale edits and monetary routes
+  ---
+  duration_ms: 12.66784
+  type: 'test'
+  ...
+# Subtest: practice rolls back illegal moves and storage failures, never silently resets corrupted saves
+ok 16 - practice rolls back illegal moves and storage failures, never silently resets corrupted saves
+  ---
+  duration_ms: 1.32279
+  type: 'test'
+  ...
+# (node:12) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: epoch backlog preserves ordering after transient failure
+ok 17 - epoch backlog preserves ordering after transient failure
+  ---
+  duration_ms: 18.307104
+  type: 'test'
+  ...
+# Subtest: epoch backlog preserves ordering after lost successful response
+ok 18 - epoch backlog preserves ordering after lost successful response
+  ---
+  duration_ms: 5.832902
+  type: 'test'
+  ...
+# Subtest: malformed API input is a client error without internal stack logging
+ok 19 - malformed API input is a client error without internal stack logging
+  ---
+  duration_ms: 57.507913
+  type: 'test'
+  ...
+# Subtest: previously superseded absent root reoffers every prize once under normal caps
+ok 20 - previously superseded absent root reoffers every prize once under normal caps
+  ---
+  duration_ms: 12.973827
+  type: 'test'
+  ...
+# (node:13) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: authoritative save, retry identity, stale tab, unauthorized access and recovery
+ok 21 - authoritative save, retry identity, stale tab, unauthorized access and recovery
+  ---
+  duration_ms: 148.582518
+  type: 'test'
+  ...
+# Subtest: housekeeping prunes stale fingerprints, sessions and nonces without reopening old actions
+ok 22 - housekeeping prunes stale fingerprints, sessions and nonces without reopening old actions
+  ---
+  duration_ms: 164.633825
+  type: 'test'
+  ...
+# Subtest: wallet authentication binds nonce, domain, network, expiry, and existing guest save
+ok 23 - wallet authentication binds nonce, domain, network, expiry, and existing guest save
+  ---
+  duration_ms: 20.047447
+  type: 'test'
+  ...
+# Subtest: purchases require finality; underpayment cannot block correct buyer; retries never duplicate inventory
+ok 24 - purchases require finality; underpayment cannot block correct buyer; retries never duplicate inventory
+  ---
+  duration_ms: 4.902079
+  type: 'test'
+  ...
+# Subtest: revive is atomic, consumed once and removes the run from rankings
+ok 25 - revive is atomic, consumed once and removes the run from rankings
+  ---
+  duration_ms: 2.874383
+  type: 'test'
+  ...
+# Subtest: crafting consumes owned items and gold; selects power versus stats; invalid craft rolls back
+ok 26 - crafting consumes owned items and gold; selects power versus stats; invalid craft rolls back
+  ---
+  duration_ms: 2.29431
+  type: 'test'
+  ...
+# Subtest: restart and consistent backup retain character, inventory, balances and chain cursor
+ok 27 - restart and consistent backup retain character, inventory, balances and chain cursor
+  ---
+  duration_ms: 7.82416
+  type: 'test'
+  ...
+# Subtest: shallow reorg never credits; deep reorg halts settlement and preserves evidence
+ok 28 - shallow reorg never credits; deep reorg halts settlement and preserves evidence
+  ---
+  duration_ms: 3.097737
+  type: 'test'
+  ...
+# Subtest: two unattended cycles persist versions, preserve old encounters, and survive rollback
+ok 29 - two unattended cycles persist versions, preserve old encounters, and survive rollback
+  ---
+  duration_ms: 208.950237
+  type: 'test'
+  ...
+# Subtest: invalid and injected packs cannot publish or execute; rejected work is durable
+ok 30 - invalid and injected packs cannot publish or execute; rejected work is durable
+  ---
+  duration_ms: 2.311541
+  type: 'test'
+  ...
+# Subtest: fee income funds one work invoice; conflict, retries, operator loss and caps preserve custody
+ok 31 - fee income funds one work invoice; conflict, retries, operator loss and caps preserve custody
+  ---
+  duration_ms: 4.012992
+  type: 'test'
+  ...
+# Subtest: milestone caps preserve pending amounts; simulated final claims survive keeper loss
+ok 32 - milestone caps preserve pending amounts; simulated final claims survive keeper loss
+  ---
+  duration_ms: 4.493122
+  type: 'test'
+  ...
+# Subtest: guardian veto returns earned milestones to pending instead of stranding them in a void root
+ok 33 - guardian veto returns earned milestones to pending instead of stranding them in a void root
+  ---
+  duration_ms: 5.737545
+  type: 'test'
+  ...
+# Subtest: HTTP demo serves static frontend, API actions and safe malformed requests; launch disabled
+ok 34 - HTTP demo serves static frontend, API actions and safe malformed requests; launch disabled
+  ---
+  duration_ms: 39.517855
+  type: 'test'
+  ...
+# Subtest: lost commit response resumes from durable seed intent without rerolling
+ok 35 - lost commit response resumes from durable seed intent without rerolling
+  ---
+  duration_ms: 2.196879
+  type: 'test'
+  ...
+# Subtest: stress scenarios conserve funds, protect claims and stop unfunded operation
+ok 36 - stress scenarios conserve funds, protect claims and stop unfunded operation
+  ---
+  duration_ms: 1.370508
+  type: 'test'
+  ...
+# Subtest: 120 players × 4 days: no convergence
+ok 37 - 120 players × 4 days: no convergence
+  ---
+  duration_ms: 6968.471165
+  type: 'test'
+  ...
+# Subtest: injected wallet authenticates separately and invalidates account/network changes
+ok 38 - injected wallet authenticates separately and invalidates account/network changes
+  ---
+  duration_ms: 3.927533
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7150.828803
